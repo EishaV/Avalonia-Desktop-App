@@ -1,0 +1,124 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"            
+             xmlns:tx="clr-namespace:AvaApp.Texts" 
+             xmlns:vm="using:AvaApp.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+             x:Class="AvaApp.Views.StatusTab">
+  <Design.DataContext>
+    <vm:StatusViewModel/>
+  </Design.DataContext>
+  <Grid ColumnDefinitions="*" RowDefinitions="*,Auto,2,Auto" >
+    <Image Grid.Row="0" Source="{Binding WebPic}" Margin="10" />
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,*,Auto,Auto" Margin="10 0 10 0">
+      <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5" Spacing="10">
+        <TextBlock Text="{Binding Error}" Foreground="{Binding ErrorColor}" FontSize="20"/>
+        <TextBlock Text="{Binding State}" Foreground="{Binding StateColor}" FontSize="20"/>
+      </StackPanel>
+      <Image Grid.Column="1" Grid.Row="0" Source="{Binding RsiPic}" />
+      <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding LastZone}'}" />
+      <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
+                  Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+        <TextBlock Text="{tx:Localize state_stamp}"/>
+        <TextBlock Text="{Binding Stamp}"/>
+      </StackPanel>
+    </Grid>
+    <Border Grid.Row="1" Margin="5"
+            BorderBrush="DimGray" BorderThickness="2" BoxShadow="2 2 2 2 Gray" CornerRadius="5" >
+      <Grid Margin="5"
+            ColumnDefinitions="Auto,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+        <Grid.Styles>
+          <Style Selector="TextBlock">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+          </Style>
+          <Style Selector="TextBlock.h1">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+          </Style>
+        </Grid.Styles>
+
+        <TextBlock Grid.Column="0" Text="{tx:Localize state_accu}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Text="{Binding BatPerc, StringFormat='\{0\}%'}"/>
+        <TextBlock Grid.Column="2" Text="{Binding BatVolt, StringFormat='\{0\}V'}"/>
+        <TextBlock Grid.Column="3" Text="{Binding BatTemp, StringFormat='\{0\}°C'}"/>
+
+        <TextBlock Grid.Column="0" Grid.Row="1" Text="{tx:Localize state_pry}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding DmpPitch, StringFormat='\{0:N2\}°'}"/>
+        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding DmpRoll, StringFormat='\{0:N2\}°'}"/>
+        <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding DmpYaw, StringFormat='\{0:N2\}°'}"/>
+
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize state_blade}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding BladeCur}"/>
+        <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding BladeAt}"/>
+        <Button Grid.Column="3" Grid.Row="2" Height="22" Padding="5 1 5 1"
+                HorizontalAlignment="Center"
+                Content="{tx:Localize state_blade_cmd}" Command="{Binding CmdBlade}" />
+
+        <TextBlock Grid.Column="0" Grid.Row="3" Text="{tx:Localize state_stat}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StatDist, StringFormat='\{0:N0\}m'}"/>
+        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding StatWork}"/>
+        <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding StatBlade}"/>
+
+        <TextBlock Grid.Column="0" Grid.Row="4" Text="Firmware" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Firmware}" Grid.RowSpan="2"/>
+      </Grid>
+
+    </Border>
+    <DockPanel Grid.Row="3" Margin="5" >
+      <Button Command="{Binding CmdStart}" IsEnabled="{Binding CanStart}">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+          <Image Source="/Assets/Start.webp" Height="16"/>
+          <TextBlock Text="{tx:Localize state_start}" />
+        </StackPanel>
+      </Button>
+      <Button Command="{Binding CmdStop}" IsEnabled="{Binding CanStop}">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+          <Image Source="/Assets/Pause.webp" Height="16"/>
+          <TextBlock Text="{tx:Localize state_stop}" />
+        </StackPanel>
+      </Button>
+      <Button Command="{Binding CmdHome}" IsEnabled="{Binding CanHome}">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+            <Image Source="/Assets/Home.webp" Height="16"/>
+          <TextBlock Text="{tx:Localize state_home}" />
+        </StackPanel>
+      </Button>
+      <Button IsVisible="{Binding CanMenu}" x:Name="BtnMenu">
+        <Button.Flyout>
+          <Flyout Placement="TopEdgeAlignedRight">
+            <StackPanel Spacing="5">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock MinWidth="110" Text="{tx:Localize state_party}" VerticalAlignment="Center" />
+                <ToggleSwitch OnContent="ein" OffContent="aus"
+                              Command="{Binding CmdParty}" IsChecked="{Binding IsParty}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" >
+                <TextBlock MinWidth="110" Text="{tx:Localize state_edge}" VerticalAlignment="Center" />
+                <Button Padding="12 3 12 3" CornerRadius="10"
+                        Command="{Binding CmdEdge}" IsEnabled="{Binding CanEdge}" >
+                  <Image Source="/Assets/Edge.webp" Height="16"/>
+                </Button>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" IsVisible="{Binding VisSafe}" >
+                <TextBlock MinWidth="110" Text="{tx:Localize state_safe}" VerticalAlignment="Center" />
+                <Button Padding="12 3 12 3" CornerRadius="10"
+                        Command="{Binding CmdSafe}" IsEnabled="{Binding CanSafe}" >
+                  <Image Source="/Assets/SafeHome.webp" Height="16"/>
+                </Button>
+              </StackPanel>
+            </StackPanel>
+          </Flyout>
+        </Button.Flyout>
+        <Image Source="/Assets/Menu.webp" Height="17"/>
+      </Button>
+      <Button Command="{Binding CmdPoll}" IsEnabled="{Binding IsCmdPollEnabled}" HorizontalAlignment="Right">
+        <StackPanel Orientation="Horizontal" Spacing="5">
+          <Image Source="/Assets/Refresh.webp" Height="16"/>
+          <TextBlock Text="{tx:Localize state_poll}" />
+        </StackPanel>
+      </Button>
+    </DockPanel>
+  </Grid>
+</UserControl>

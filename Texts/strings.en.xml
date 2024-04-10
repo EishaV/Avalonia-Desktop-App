@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English -->
+<resources>
+  <!-- Shared with Positec -->
+  <string name="mower_error">Error</string>
+  <string name="mower_error_battery_low">Battery low</string>
+  <string name="mower_error_battery_charge">Battery charging error</string>
+  <string name="mower_error_battery_temp">Battery temperature</string>
+  <string name="mower_error_battery_trunk">Battery cover open</string>
+  <string name="mower_error_blade_motor_fault">Blade motor fault</string>
+  <string name="mower_error_close_door_to_cut">Close door to cut</string>
+  <string name="mower_error_close_to_go_home">Close to go home</string>
+  <string name="mower_error_home_find_timeout">Home find timeout</string>
+  <string name="mower_error_lifted">Mower lifted</string>
+  <string name="mower_error_lock">Mower lock</string>
+  <string name="mower_error_outside_wire">Mower outside wire</string>
+  <string name="mower_error_reverse_wire">Reverse wire</string>
+  <string name="mower_error_trapped">Mower trapped</string>
+  <string name="mower_error_trapped_timeout">Timeout trapped</string>
+  <string name="mower_error_upside_down">Mower upside down</string>
+  <string name="mower_error_wheel_motor_fault">Wheel motor fault</string>
+  <string name="mower_error_wire_missing">Wire missing</string>
+  <string name="mower_error_wire_sync">Wire signal out of sync</string>
+  
+  <string name="mower_error_blade_height_adjustment">Höhenverstellung blockiert</string>
+  <string name="mower_error_charging_station_docking">Charging station docking error</string>
+  <string name="mower_error_excessive_slope">Excessive slope</string>
+  <string name="mower_error_hbi_error">HBI error</string>
+  <string name="mower_error_insufficient_sensor_data">No Position</string>
+  <string name="mower_error_map_error">Map error</string>
+  <string name="mower_error_missing_charging_station">Ladestation fehlt</string>
+  <string name="mower_error_ota_error">Firmware upgrade error</string>
+  <string name="mower_error_training_start_disallowed">Map training start not allowed</string>
+  <string name="mower_error_unreachable_charging_station">Unreachable charging station</string>
+  <string name="mower_error_unreachable_zone">Unreachable zone</string>
+
+  <string name="mower_error_calibration_needed">Calibration needed</string>
+  <string name="mower_error_camera_error">Camera error</string>
+  <string name="mower_error_camera_lens_dirty">Camera lens is dirty</string>
+  <string name="mower_error_camera_low_light">Camera light too low</string>
+  <string name="mower_error_headlight_error">Headlight error</string>
+  <string name="mower_error_mapping_exploration_failed">Lawn exploration failed</string>
+  <string name="mower_error_mapping_exploration_required">Lawn exploration required</string>
+  <string name="mower_error_rfid_reader_error">RFID reader error</string>
+ 
+  <string name="mower_area_search">Search area</string>
+  <string name="mower_area_training">raining area</string>
+  <string name="mower_border_cut">Border cut</string>
+  <string name="mower_charging">Charging</string>
+  <string name="mower_going_home">Going home</string>
+  <string name="mower_home">Home</string>
+  <string name="mower_idle">Manual stop</string>
+  <string name="mower_leaving_home">Leaving home</string>
+  <string name="mower_mowing">Mowing</string>
+  <string name="mower_pause">Pause</string>
+  <string name="mower_rain_delay">Rain delay</string>
+  <string name="mower_trapped">Trapped</string>
+
+  <string name="mower_status_completable_map_training">Map training (completable)</string>
+  <string name="mower_status_firmware_upgrading">Upgrading firmware</string>
+  <string name="mower_status_map_downloading">Downloading map</string>
+  <string name="mower_status_map_processing">Processing map</string>
+  <string name="mower_status_mower_status_activate_sim">Activate SIM</string>
+  <string name="mower_status_mower_status_geo_fence_not_set">The geo-fence is not enabled</string>
+  <string name="mower_status_mower_status_missing_setup_location">Missing Mission position</string>
+  <string name="mower_status_mower_status_out_of_geo_fence">Mission is out of the geo-fence</string>
+  <string name="mower_status_mower_status_set_mower_location">Set Mission location to enable weather conditions</string>
+  <string name="mower_status_mower_status_sim_activation_error">SIM activation error</string>
+  <string name="mower_status_mower_status_sim_activation_in_progress">SIM activation in progress</string>
+  <string name="mower_status_mower_status_sim_expired">SIM contract has expired</string>
+  <string name="mower_status_mower_status_weather_info_unavailable">Weather info not available at this time</string>
+  <string name="mower_status_mower_status_weather_information_source">Weather information by OpenWeatherMap</string>
+  <string name="mower_status_not_completable_map_training">Map training (not completable)</string>
+  <string name="mower_status_pending_accessory_activation">%1$s activation in progress</string>
+
+  <!-- Only in AvaApp -->
+  <string name="main_mower">Mower</string>
+  <string name="main_acc">Account - login or change</string>
+  <string name="main_email">Email</string>
+  <string name="main_pass">Password</string>
+  <string name="main_login">Login</string>
+ <string name="main_wait">Bitte einen Moment warten</string>
+
+  <string name="state">State</string>
+  <string name="state_daywork">Working times</string>
+  <string name="state_accu">Accumulator</string>
+  <string name="state_pry">PitchRollYaw</string>
+  <string name="state_blade">Blade usage times</string>
+  <string name="state_blade_cmd">Reset</string>
+  <string name="state_stat">Statistics</string>
+  <string name="state_stamp">Last update</string>
+  <string name="state_start">Start</string>
+  <string name="state_home">Home</string>
+  <string name="state_stop">Stop</string>
+  <string name="state_party">Partymode</string>
+  <string name="state_edge">Edge cut</string>
+  <string name="state_safe">Safe home</string>
+  <string name="state_poll">Poll</string>
+
+  <string name="cfg">Config</string>
+  <string name="cfg_sc">Plan of mowing</string>
+  <string name="cfg_sc_dow">Day</string>
+  <string name="cfg_sc_cut">Edge</string>
+  <string name="cfg_sc_beg">Start</string>
+  <string name="cfg_sc_min">Duration</string>
+  <string name="cfg_sc_end">End</string>
+  <string name="cfg_sc_perc">Correction</string>
+  <string name="cfg_mz">Multizones (starting points)</string>
+  <string name="cfg_mz_sp">SP [m]</string>
+  <string name="cfg_mz_perc">Portion</string>
+  <string name="cfg_more">More settings</string>
+  <string name="cfg_rain">Rain delay</string>
+  <string name="cfg_torq">Torque</string>
+  <string name="cfg_save">Save...</string>
+
+  <string name="act">Activities</string>
+  <string name="act_stamp">Date Time</string>
+  <string name="act_state">State</string>
+  <string name="act_poll">Recall</string> 
+</resources>

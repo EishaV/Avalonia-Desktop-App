@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- German -->
+<resources>
+  <!-- Shared with Positec -->
+  <string name="mower_error">Fehler</string>
+  <string name="mower_error_battery_charge">Akku-Lade-Fehler</string>
+  <string name="mower_error_battery_low">Akkustand niedrig</string>
+  <string name="mower_error_battery_temp">Akku-Temperatur-Fehler</string>
+  <string name="mower_error_battery_trunk">Akkuabdeckung offen</string>
+  <string name="mower_error_blade_motor">Fehler Messermotor</string>
+  <string name="mower_error_close_door_to_cut">Klappe zum Mähen schließen</string>
+  <string name="mower_error_close_to_go_home">Schließen zur Heimfahrt</string>
+  <string name="mower_error_find_timeout">Zeitüberschreitung Heimfahrt</string>
+  <string name="mower_error_lifted">Mäher angehoben</string>
+  <string name="mower_error_locked">Mäher gesperrt</string>
+  <string name="mower_error_outside_wire">Mäher außerhalb Grenzdraht</string>
+  <string name="mower_error_reverse_wire">Drahtanschluss tauschen</string>
+  <string name="mower_error_trapped">Mäher festgefahren</string>
+  <string name="mower_error_trapped_timeout">Zeitüberschreitung ‘gefangen’</string>
+  <string name="mower_error_upside_down">Mäher umgedreht</string>
+  <string name="mower_error_wheel_motor">Fehler Antriebe</string>
+  <string name="mower_error_wire_missing">Draht fehlt</string>
+  <string name="mower_error_wire_sync">Signal unsynchron</string>
+
+  <string name="mower_error_blade_height_adjustment">Höhenverstellung blockiert</string>
+  <string name="mower_error_charging_station_docking">Ladestation andocken</string>
+  <string name="mower_error_excessive_slope">Übermäßige Neigung</string>
+  <string name="mower_error_hbi_error">Fehler HBI</string>
+  <string name="mower_error_insufficient_sensor_data">Keine Position</string>
+  <string name="mower_error_map_error">Kartenfehler</string>
+  <string name="mower_error_missing_charging_station">Ladestation fehlt</string>
+  <string name="mower_error_ota_error">Firmware-Upgrade-Fehler</string>
+  <string name="mower_error_training_start_disallowed">Karten-Training nich erlaubt</string>
+  <string name="mower_error_unreachable_charging_station">Ladestation unerreichbar</string>
+  <string name="mower_error_unreachable_zone">Zone unerreichbar</string>
+
+  <string name="mower_error_calibration_needed">Calibration needed</string>
+  <string name="mower_error_camera_error">Kamerafehler</string>
+  <string name="mower_error_camera_lens_dirty">Camera lens is dirty</string>
+  <string name="mower_error_camera_low_light">Camera light too low</string>
+  <string name="mower_error_headlight_error">Kopflicht-Fehler</string>
+  <string name="mower_error_mapping_exploration_failed">Rasenerkundung fehlgeschlagen</string>
+  <string name="mower_error_mapping_exploration_required">Rasenerkundung erfordelich</string>
+  <string name="mower_error_rfid_reader_error">RFID Lesefehler</string>
+    
+  <string name="mower_area_search">Zonenanfahrt</string>
+  <string name="mower_area_training">Zonentraining</string>
+  <string name="mower_border_cut">Kantenschnitt</string>
+  <string name="mower_charging">Aufladen</string>
+  <string name="mower_going_home">Heimfahrt</string>
+  <string name="mower_home">Daheim</string>
+  <string name="mower_idle">Nixtun</string>
+  <string name="mower_leaving_home">Ausfahrt</string>
+  <string name="mower_mowing">Mähen</string>
+  <string name="mower_pause">Pause</string>
+  <string name="mower_rain_delay">Regenverzögerung</string>
+  <string name="mower_trapped">Befreihung</string>
+  
+  <string name="mower_status_completable_map_training">Map training (completable)</string>
+  <string name="mower_status_firmware_upgrading">Upgrading firmware</string>
+  <string name="mower_status_map_downloading">Downloading map</string>
+  <string name="mower_status_map_processing">Processing map</string>
+  <string name="mower_status_mower_status_activate_sim">Activate SIM</string>
+  <string name="mower_status_mower_status_geo_fence_not_set">The geo-fence is not enabled</string>
+  <string name="mower_status_mower_status_missing_setup_location">Missing Mission position</string>
+  <string name="mower_status_mower_status_out_of_geo_fence">Mission is out of the geo-fence</string>
+  <string name="mower_status_mower_status_set_mower_location">Set Mission location to enable weather conditions</string>
+  <string name="mower_status_mower_status_sim_activation_error">SIM activation error</string>
+  <string name="mower_status_mower_status_sim_activation_in_progress">SIM activation in progress</string>
+  <string name="mower_status_mower_status_sim_expired">SIM contract has expired</string>
+  <string name="mower_status_mower_status_weather_info_unavailable">Weather info not available at this time</string>
+  <string name="mower_status_mower_status_weather_information_source">Weather information by OpenWeatherMap</string>
+  <string name="mower_status_not_completable_map_training">Map training (not completable)</string>
+  <string name="mower_status_pending_accessory_activation">%1$s activation in progress</string>
+
+  <!-- Only in AvaApp -->
+  <string name="main_mower">Mäher</string>
+  <string name="main_acc">Konto - anmelden oder wechseln</string>
+  <string name="main_email">Email</string>
+  <string name="main_pass">Passwort</string>
+  <string name="main_login">Anmelden</string>
+  <string name="main_wait">Bitte einen Moment warten</string>
+
+  <string name="state">Status</string>
+  <string name="state_daywork">Arbeitszeit</string>
+  <string name="state_accu">Akkumulator</string>
+  <string name="state_pry">Gierwinkel</string>
+  <string name="state_blade">Mähzeit</string>
+  <string name="state_blade_cmd">Setze 0</string>
+  <string name="state_stat">Statistik</string>
+  <string name="state_stamp">Letzte Aktualisierung</string>
+  <string name="state_start">Start</string>
+  <string name="state_home">Heim</string>
+  <string name="state_stop">Stopp</string>
+  <string name="state_party">Partymodus</string>
+  <string name="state_edge">Kantenschnitt</string>
+  <string name="state_safe">Sicher-Heim</string>
+  <string name="state_poll">Poll</string>
+  
+  <string name="cfg">Konfig</string>
+  <string name="cfg_sc">Mähzeitplan</string>
+  <string name="cfg_sc_dow">Tag</string>
+  <string name="cfg_sc_cut">Kante</string>
+  <string name="cfg_sc_beg">Start</string>
+  <string name="cfg_sc_min">Dauer</string>
+  <string name="cfg_sc_end">Ende</string>
+  <string name="cfg_sc_perc">Korrektur</string>
+  <string name="cfg_mz">Multizonen/Startpunkte</string>
+  <string name="cfg_mz_sp">SP [m]</string>
+  <string name="cfg_mz_perc">Anteil</string>
+  <string name="cfg_more">Weitere Einstellungen</string>
+  <string name="cfg_rain">Regenzeit</string>
+  <string name="cfg_torq">Drehmoment</string>
+  <string name="cfg_save">Sichern...</string>
+
+  <string name="act">Aktivität</string>
+  <string name="act_stamp">Datum Zeit</string>
+  <string name="act_state">Zustand</string>
+  <string name="act_poll">Abrufen</string>
+</resources>

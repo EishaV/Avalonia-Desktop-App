@@ -1,0 +1,22 @@
+{
+  "WX": {
+    "Login": "https://id.worx.com/",
+    "WebApi": "https://api.worxlandroid.com/api/v2/",
+    "CliId": "013132A8-DB34-4101-B993-3C8348EA0EBC"
+  },
+  "KR": {
+    "Login": "https://id.kress.com/",
+    "WebApi": "https://api.kress-robotik.com/api/v2/",
+    "CliId": "62FA25FB-3509-4778-A835-D5C50F4E5D88"
+  },
+  "LX": {
+    "Login": "https://id.landxcape-services.com/",
+    "WebApi": "https://api.landxcape-services.com/api/v2/",
+    "CliId": "4F1B89F0-230F-410A-8436-D9610103A2A4"
+  },
+  "SM": {
+    "Login": "https://id.watermelon.smartmower.cloud/",
+    "WebApi": "https://api.watermelon.smartmower.cloud/api/v2/",
+    "CliId": "AFD0DA53-FC0C-49FA-9A8F-1C2342F95E3E"
+  }
+}

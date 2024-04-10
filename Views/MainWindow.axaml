@@ -1,0 +1,143 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:AvaApp.Views"
+        xmlns:tx="clr-namespace:AvaApp.Texts" 
+        xmlns:vm="using:AvaApp.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+        x:Class="AvaApp.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="PosiMowApp 1.0.??-Alpha"
+        Icon="/Assets/avalonia-logo.ico"
+        MinWidth="410" MinHeight="520"
+        >
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto,*">
+    <Grid.Styles>
+      <Style Selector="Button">
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="CornerRadius" Value="8"/>
+      </Style>
+      <Style Selector="Button:disbled">
+        <Setter Property="Background" Value="DarkRed" />
+      </Style>
+    </Grid.Styles>
+    <Button Margin="10 0 0 0" Padding="0" Name="BtnAcc" ToolTip.Tip="{tx:Localize main_acc}">
+      <Image Source="/Assets/Account.webp" Width="25" />
+      <Button.Flyout>
+        <Flyout Placement="BottomEdgeAlignedLeft">
+          <Grid ColumnDefinitions="Auto, *" RowDefinitions="30,30,30,*" Width="300" >
+            <Grid.Styles>
+              <Style Selector="TextBlock">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+              </Style>
+              <Style Selector="TextBox, ComboBox">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+              </Style>
+            </Grid.Styles>
+
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="API" HorizontalAlignment="Left"/>
+            <ComboBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" Padding="6 0"
+                      ItemsSource="{Binding UsrApis}" SelectedItem="{Binding UsrApi}" />
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="{tx:Localize main_email}" />
+            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding UsrMail}" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize main_pass}" />
+            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding UsrPass}" PasswordChar="*" />
+            <Button Grid.Column="1" Grid.Row="3" Margin="5" HorizontalAlignment="Right"
+                    Command="{Binding CmdLogin}" Content="{tx:Localize main_login}" />
+            <Button Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left"
+                    Command="{Binding CmdTrace}" Margin="5">Trace...</Button>
+          </Grid>
+        </Flyout>
+      </Button.Flyout>
+    </Button>
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="5" Spacing="5" HorizontalAlignment="Center" >
+      <TextBlock Text="{tx:Localize main_mower}" VerticalAlignment="Center" FontWeight="DemiBold" FontSize="20"/>
+      <ComboBox MinWidth="200" VerticalAlignment="Center"
+                ItemsSource="{Binding MowNames}" SelectedIndex="{Binding MowIdx}" />
+      <Button Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}" Height="30"
+              Margin="0" Padding="5 3 5 3" VerticalAlignment="Center" >
+        <Image Source="/Assets/Refresh.webp" />
+      </Button>
+    </StackPanel>
+
+    <TextBlock Grid.Row="1" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
+               HorizontalAlignment="Center" Margin="10 50 10 0" FontSize="50"
+               TextWrapping="Wrap" TextAlignment="Center" />
+    <!--
+    <TextBlock Grid.Row="1" Text="Bitte einen Moment warten" TextWrapping="Wrap" TextAlignment="Center"
+               HorizontalAlignment="Center" Margin="10 50 10 0" FontSize="50"/>
+    -->
+    <TabControl Grid.Row="1" SelectedIndex="{Binding TabIdx}">
+      <TabControl.Styles>
+        <Style Selector="TabItem">
+          <Setter Property="FontSize" Value="20"/>
+          <Setter Property="MinHeight" Value="30"/>
+        </Style>
+      </TabControl.Styles>
+      
+      <TabItem Header="{tx:Localize state}">
+        <views:StatusTab DataContext="{Binding StatusVM}" Name="ViewStatus"></views:StatusTab>
+      </TabItem>
+
+      <TabItem Header="{tx:Localize cfg}" IsEnabled="{Binding CanTabCfg}">
+        <views:ConfigTab DataContext="{Binding ConfigVM}"></views:ConfigTab>
+      </TabItem>
+
+      <TabItem Header="Mqtt">
+        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,Auto">
+          <TextBox Grid.ColumnSpan="3" IsReadOnly="True" Background="DimGray"
+                   ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                   ScrollViewer.VerticalScrollBarVisibility="Visible"
+                   Text="{Binding MqttJson}" />
+          <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
+                     Text="CmdIn-String" />
+          <AutoCompleteBox Grid.Column="1" Grid.Row="1" Watermark="press quote for examples"
+                           Margin="5" 
+                           ItemsSource="{Binding MqttIns}" Text="{Binding MqttIn}"/>
+          <Button Grid.Column="2" Grid.Row="1"
+                  Command="{Binding MqttCmd}">Send</Button>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="{tx:Localize act}">
+        <Grid ColumnDefinitions="*" RowDefinitions="*,Auto">
+          <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="False"
+                    RowHeight="20" >
+            <DataGrid.Styles>
+              <Style Selector="DataGridRow">
+                <Setter Property="Foreground" Value="{Binding Color}" />
+                <Setter Property="FontSize" Value="15" />
+              </Style>
+              <Style Selector="DataGridColumnHeader">
+                <Setter Property="FontSize" Value="15" />
+              </Style>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Zeitstempel" Binding="{Binding Stamp}"/>
+              <DataGridTextColumn Header="Status/Fehler" Binding="{Binding State}" />
+              <DataGridTextColumn Header="C" Binding="{Binding Charge}" />
+            </DataGrid.Columns>
+          </DataGrid>
+          <DockPanel Grid.Row="1">
+            <Button DockPanel.Dock="Right" IsVisible="False"
+                    Command="{Binding ActCmdCall}" Content="{tx:Localize act_poll}" />
+            <Button DockPanel.Dock="Right" Command="{Binding ActCmdJson}">Json...</Button>
+          </DockPanel>
+        </Grid>
+      </TabItem>
+
+      <TabItem Header="Plugin">
+        <views:PluginTab DataContext="{Binding PluginVM}"></views:PluginTab>
+      </TabItem>
+    </TabControl>
+  </Grid>
+
+</Window>
