@@ -16,6 +16,7 @@ using MQTTnet.Diagnostics;
 
 using ApiDic = System.Collections.Generic.Dictionary<string, Positec.ApiEntry>;
 using Plugin;
+using System.Reflection.Metadata;
 
 namespace Positec {
   public delegate void ErrDelegte(string msg);
@@ -371,13 +372,17 @@ namespace Positec {
           var content = await res.Content.ReadAsStringAsync();
 
           Trace.TraceInformation($"Refresh token: {content}");
-          if( Json.Read<OAuth>(content) is OAuth oa ) {
+          if( Json.Read<OAuth>(content) is OAuth oa && oa.Type == "Bearer" ) {
             _oAuth = oa;
             File.WriteAllText(TokenFile, content);
             httpClient.DefaultRequestHeaders.Clear();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"{_oAuth.Type} {_oAuth.Access}");
             _tokDT = DateTime.Now;
             return true;
+          } else {
+            Trace.TraceError($"Oauth error: {content}");
+            if( Json.Read<OError>(content) is OError oe ) Err($"{oe.Error} - {oe.Message}");
+            else Err($"Unknown - {content}");
           }
         } catch( Exception ex ) {
           Err(ex.Message);
