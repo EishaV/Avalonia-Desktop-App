@@ -1,21 +1,19 @@
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Reflection;
+using System.Text;
 
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+
 using AvaApp.ViewModels;
 using AvaApp.Views;
-using MsBox.Avalonia;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Globalization;
-using CSScriptLib;
-using Plugin;
-using MsBox.Avalonia.Enums;
-using Avalonia.Controls;
 
 namespace AvaApp {
   public partial class App : Application {
