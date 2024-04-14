@@ -7,7 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Title>Avalonia App for Positec Mowers</Title>
     <Authors>EishaV</Authors>
-    <VersionPrefix>1.0.16</VersionPrefix>
+    <VersionPrefix>1.0.17</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>    
   </PropertyGroup>

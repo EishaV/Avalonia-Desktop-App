@@ -27,7 +27,7 @@
     <Border Grid.Row="1" Margin="5"
             BorderBrush="DimGray" BorderThickness="2" BoxShadow="2 2 2 2 Gray" CornerRadius="5" >
       <Grid Margin="5"
-            ColumnDefinitions="Auto,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            ColumnDefinitions="Auto,*,*,,*" RowDefinitions="40,Auto,Auto,Auto,Auto,Auto">
         <Grid.Styles>
           <Style Selector="TextBlock">
             <Setter Property="Margin" Value="5"/>
@@ -39,30 +39,34 @@
           </Style>
         </Grid.Styles>
 
-        <TextBlock Grid.Column="0" Text="{tx:Localize state_accu}" Classes="h1"/>
-        <TextBlock Grid.Column="1" Text="{Binding BatPerc, StringFormat='\{0\}%'}"/>
-        <TextBlock Grid.Column="2" Text="{Binding BatVolt, StringFormat='\{0\}V'}"/>
-        <TextBlock Grid.Column="3" Text="{Binding BatTemp, StringFormat='\{0\}°C'}"/>
+        <Image Grid.Column="1" Source="/Assets/Orient_Pitch.png" />
+        <Image Grid.Column="2" Source="/Assets/Orient_Roll.png" />
+        <Image Grid.Column="3" Source="/Assets/Orient_Yaw.png" />
 
         <TextBlock Grid.Column="0" Grid.Row="1" Text="{tx:Localize state_pry}" Classes="h1"/>
         <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding DmpPitch, StringFormat='\{0:N2\}°'}"/>
         <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding DmpRoll, StringFormat='\{0:N2\}°'}"/>
         <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding DmpYaw, StringFormat='\{0:N2\}°'}"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize state_blade}" Classes="h1"/>
-        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding BladeCur}"/>
-        <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding BladeAt}"/>
-        <Button Grid.Column="3" Grid.Row="2" Height="22" Padding="5 1 5 1"
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize state_accu}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding BatPerc, StringFormat='\{0\}%'}"/>
+        <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding BatVolt, StringFormat='\{0\}V'}"/>
+        <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding BatTemp, StringFormat='\{0\}°C'}"/>
+
+        <TextBlock Grid.Column="0" Grid.Row="3" Text="{tx:Localize state_blade}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding BladeCur}"/>
+        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding BladeAt}"/>
+        <Button Grid.Column="3" Grid.Row="3" Height="22" Padding="5 1 5 1"
                 HorizontalAlignment="Center"
                 Content="{tx:Localize state_blade_cmd}" Command="{Binding CmdBlade}" />
 
-        <TextBlock Grid.Column="0" Grid.Row="3" Text="{tx:Localize state_stat}" Classes="h1"/>
-        <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding StatDist, StringFormat='\{0:N0\}m'}"/>
-        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding StatWork}"/>
-        <TextBlock Grid.Column="3" Grid.Row="3" Text="{Binding StatBlade}"/>
+        <TextBlock Grid.Column="0" Grid.Row="4" Text="{tx:Localize state_stat}" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding StatDist, StringFormat='\{0:N0\}m'}"/>
+        <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding StatWork}"/>
+        <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding StatBlade}"/>
 
-        <TextBlock Grid.Column="0" Grid.Row="4" Text="Firmware" Classes="h1"/>
-        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding Firmware}" Grid.RowSpan="2"/>
+        <TextBlock Grid.Column="0" Grid.Row="5" Text="Firmware" Classes="h1"/>
+        <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Firmware}" Grid.RowSpan="2"/>
       </Grid>
 
     </Border>
