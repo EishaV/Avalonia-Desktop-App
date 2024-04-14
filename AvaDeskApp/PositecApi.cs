@@ -453,7 +453,7 @@ namespace Positec {
         _mqttCOB = _mqttCOB.WithKeepAlivePeriod(TimeSpan.FromMinutes(5));
         //_mqttCOB = _mqttCOB.WithNoKeepAlive();
         _mqttCOB = _mqttCOB.WithTcpServer(broker, 443);
-        _mqttCOB = _mqttCOB.WithClientId($"{_api}/USER/{userid}/AvaApp/{Uuid}");
+        _mqttCOB = _mqttCOB.WithClientId($"{_api}/USER/{userid}/AvaDeskApp/{Uuid}");
         _mqttCOB = _mqttCOB.WithTlsOptions(obp_tls);
         _mqttCOB = _mqttCOB.WithCleanSession(true);
       } catch( Exception ex ) {

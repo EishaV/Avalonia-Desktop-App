@@ -15,7 +15,7 @@ using AvaApp.Texts;
 
 namespace AvaApp.ViewModels {
   public class StatusViewModel : ReactiveObject {
-    const string AvaAss = "avares://AvaApp/Assets";
+    const string AvaAss = "avares://AvaDeskApp/Assets";
     private int _idx;
 
     internal static PositecApi Client => MainWindowViewModel.Instance.Client;

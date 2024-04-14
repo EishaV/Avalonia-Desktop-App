@@ -24,7 +24,7 @@ namespace AvaApp {
     public override async void OnFrameworkInitializationCompleted() {
       if( Design.IsDesignMode ) return;
 
-      string s, title = "PosiMowApp";
+      string s, title;
       string dir = AppContext.BaseDirectory;
       Assembly assembly = Assembly.GetExecutingAssembly();
 
@@ -35,6 +35,7 @@ namespace AvaApp {
 
       Console.WriteLine($"BaseDir {dir}");
       Console.WriteLine($"Assembly {assembly.Location} {assembly.FullName}");
+      title = assembly.GetName().Name ?? "PosiMowApp";
 
       int pid = Environment.ProcessId; Console.WriteLine($"ProcessId {pid}");
       Process[] ps = Process.GetProcesses(); Console.WriteLine($"Processes {ps.Length}");
@@ -42,7 +43,7 @@ namespace AvaApp {
 
       sb.AppendLine($"{pid} - {assembly.FullName} - {dir}");
       foreach( Process process in ps ) {
-        if( (process.ProcessName == "dotnet" || process.ProcessName == "AvaApp") ) {
+        if( (process.ProcessName == "dotnet" || process.ProcessName == title) ) {
           sb.AppendLine($"{process.Id} - {process.ProcessName}"); Console.WriteLine($"Process {process.ProcessName}");
           foreach( ProcessModule pm in process.Modules ) {
             Console.WriteLine($"  Module {pm.FileName}");
@@ -66,6 +67,7 @@ namespace AvaApp {
         CfgFrame fr = mwvm.Config.Frame;
         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
+        if( fr.X < 0 || fr.Y < 0 ) fr = new CfgFrame();
         desktop.MainWindow = new MainWindow {
           DataContext = mwvm, Title = $"{title} {fvi.ProductVersion}",
           WindowStartupLocation = WindowStartupLocation.Manual,

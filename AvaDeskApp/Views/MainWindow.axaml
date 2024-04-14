@@ -8,7 +8,7 @@
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
         x:Class="AvaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="PosiMowApp 1.0.??-Alpha"
+        Title="AvaDeskApp"
         Icon="/Assets/avalonia-logo.ico"
         MinWidth="410" MinHeight="520"
         >
