@@ -194,8 +194,13 @@ namespace AvaApp.ViewModels {
         string pass = UsrPass;
 
         b?.Flyout?.Hide();
-        if( client.Connected ) client.Exit();
+        if( client.Connected ) {
+          Trace.TraceInformation($"Main.Login Exiting old connection");
+          client.Exit();
+        }
+        Trace.TraceInformation($"Main.Login {api} {mail}");
         if( await client.Login(api, mail, pass) && client.Mowers.Count > 0 ) {
+          Trace.TraceInformation($"Main.Login Start Mqtt");
           if( await StartMqtt() ) {
             await client.GetStatus(0);
             MowIdx = 0;
