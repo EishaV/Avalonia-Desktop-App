@@ -67,7 +67,7 @@ namespace AvaApp {
         CfgFrame fr = mwvm.Config.Frame;
         FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-        if( fr.X < 0 || fr.Y < 0 ) fr = new CfgFrame();
+        //? if( fr.X < 0 || fr.Y < 0 ) fr = new CfgFrame();
         desktop.MainWindow = new MainWindow {
           DataContext = mwvm, Title = $"{title} {fvi.ProductVersion}",
           WindowStartupLocation = WindowStartupLocation.Manual,

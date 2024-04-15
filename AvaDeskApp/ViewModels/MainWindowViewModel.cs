@@ -280,7 +280,7 @@ namespace AvaApp.ViewModels {
     public void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e) {
       CfgJson cfg = new();
 
-      if( sender is MainWindow mw ) {
+      if( sender is MainWindow mw && mw.WindowState == WindowState.Normal ) {
         cfg.Frame = new() { X = mw.Position.X, Y = mw.Position.Y, W = mw.Width, H = mw.Height };
       }
       cfg.Uuid = Uuid;

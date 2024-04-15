@@ -9,7 +9,7 @@
         x:Class="AvaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AvaDeskApp"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/Mower.ico"
         MinWidth="410" MinHeight="520"
         >
 

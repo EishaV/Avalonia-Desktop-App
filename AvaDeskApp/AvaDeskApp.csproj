@@ -9,7 +9,8 @@
     <Authors>EishaV</Authors>
     <VersionPrefix>1.0.17</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
-    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>    
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <ApplicationIcon>Assets\Mower.ico</ApplicationIcon>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,6 +30,10 @@
     <Compile Include="Plugins\PluginTest.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Mower.ico" />
   </ItemGroup>
 
   <ItemGroup>
