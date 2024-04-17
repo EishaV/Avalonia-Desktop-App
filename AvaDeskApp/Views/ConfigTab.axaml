@@ -23,12 +23,9 @@
       <Setter Property="VerticalAlignment" Value="Stretch"/>
       <Setter Property="Padding" Value="0 3 0 3"/>
     </Style>
-    <!--
     <Style Selector="DataValidationErrors">
-      <Setter Property="Template" Value="{DynamicResource TooltipDataValidationContentTemplate}" />
-      <Setter Property="ErrorTemplate" Value="{DynamicResource TooltipDataValidationErrorTemplate}" />
-    </Style>
-    -->
+      <Setter Property="Theme" Value="{StaticResource TooltipDataValidationErrors}" />
+    </Style>    
   </UserControl.Styles>
 
   <DockPanel>
@@ -40,7 +37,7 @@
         <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True"
                   MinHeight="30" Padding="0" Width="370" >
           <StackPanel Background="DarkBlue">
-            <Grid ColumnDefinitions="2*,2*,4*,4*,2*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
+            <Grid ColumnDefinitions="2*,2*,4*,4*,3*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
               <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize cfg_sc_dow}"/>
               <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize cfg_sc_cut}"/>
               <TextBlock Grid.Column="2" Classes="h1" Text="{tx:Localize cfg_sc_beg}"/>
@@ -55,21 +52,17 @@
               </ItemsControl.Styles>              
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Grid ColumnDefinitions="2*,2*,4*,4*,2*" RowDefinitions="27" ShowGridLines="True" Margin="0">
+                  <Grid ColumnDefinitions="2*,2*,4*,4*,3*" RowDefinitions="27" ShowGridLines="True" Margin="0">
                     <TextBlock Grid.Column="0" Text="{Binding Wday}"/>
                     <Viewbox Grid.Column="1">
                       <CheckBox IsChecked="{Binding Edge}" HorizontalAlignment="Center" />
                     </Viewbox>
-                    <Viewbox Grid.Column="2">
-                      <TextBox Text="{Binding Beg}" MinHeight="25" Padding="0"
-                               HorizontalContentAlignment="Center" Margin="5 1"/>
-                    </Viewbox>
-                    <Viewbox Grid.Column="3" Margin="1">
-                      <TextBox Text="{Binding Min}" MinHeight="25" Padding="5 0"
-                               HorizontalContentAlignment="Right" />
-                    </Viewbox>
+                      <TextBox Grid.Column="2" Text="{Binding Beg}" HorizontalContentAlignment="Center"
+                               MinHeight="25" Margin="10 1" Padding="0" />
+                      <TextBox Grid.Column="3" Text="{Binding Min}" HorizontalContentAlignment="Right"
+                               MinHeight="25" Margin="10 1" Padding="5 0" />
                     <TextBlock Grid.Column="4" Text="{Binding End}"
-                               HorizontalAlignment="Center" Margin="5 1" />
+                               HorizontalAlignment="Right" Margin="10 1" />
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
