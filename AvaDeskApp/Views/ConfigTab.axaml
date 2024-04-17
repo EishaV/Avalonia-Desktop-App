@@ -35,12 +35,12 @@
     <Button Margin="5" DockPanel.Dock="Bottom" HorizontalAlignment="Right"
             Command="{Binding CmdSave}" IsEnabled="{Binding CanSave}"
             Content="{tx:Localize cfg_save}" />
-    <ScrollViewer AllowAutoHide="False" Width="390">
+    <ScrollViewer AllowAutoHide="False">
       <StackPanel>
         <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True"
-                  Width="370" MinHeight="30" Padding="0" >
+                  MinHeight="30" Padding="0" Width="370" >
           <StackPanel Background="DarkBlue">
-            <Grid ColumnDefinitions="39,61,93,93,90" RowDefinitions="25" Background="Silver" ShowGridLines="True">
+            <Grid ColumnDefinitions="2*,2*,4*,4*,2*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
               <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize cfg_sc_dow}"/>
               <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize cfg_sc_cut}"/>
               <TextBlock Grid.Column="2" Classes="h1" Text="{tx:Localize cfg_sc_beg}"/>
@@ -55,18 +55,21 @@
               </ItemsControl.Styles>              
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Grid ColumnDefinitions="40,62,92,92,90" RowDefinitions="26" ShowGridLines="True" Margin="0">
+                  <Grid ColumnDefinitions="2*,2*,4*,4*,2*" RowDefinitions="27" ShowGridLines="True" Margin="0">
                     <TextBlock Grid.Column="0" Text="{Binding Wday}"/>
-                    <CheckBox Grid.Column="1" IsChecked="{Binding Edge}"
-                              HorizontalAlignment="Center" />
-                    <TextBox Grid.Column="2" Text="{Binding Beg}"
-                             HorizontalContentAlignment="Center"
-                             Margin="5 1 5 1" MinHeight="20" Padding="0"/>
-                    <TextBox Grid.Column="3" Text="{Binding Min}"
-                             HorizontalContentAlignment="Right"
-                             Margin="5 1 5 1" MinHeight="20" Padding="5 0"/>
+                    <Viewbox Grid.Column="1">
+                      <CheckBox IsChecked="{Binding Edge}" HorizontalAlignment="Center" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="2">
+                      <TextBox Text="{Binding Beg}" MinHeight="25" Padding="0"
+                               HorizontalContentAlignment="Center" Margin="5 1"/>
+                    </Viewbox>
+                    <Viewbox Grid.Column="3" Margin="1">
+                      <TextBox Text="{Binding Min}" MinHeight="25" Padding="5 0"
+                               HorizontalContentAlignment="Right" />
+                    </Viewbox>
                     <TextBlock Grid.Column="4" Text="{Binding End}"
-                               HorizontalAlignment="Center" Margin="5 1 5 1" />
+                               HorizontalAlignment="Center" Margin="5 1" />
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
