@@ -142,41 +142,50 @@ namespace AvaApp.ViewModels {
 
         switch( api ) {
           case "WX":
-          switch( pid ) {
-            case 21: case 24: case 33: case 37: img = "WR101SI_WR105SI.webp"; break;
-            case 22: case 23: case 34: case 36: img = "WR102SI_WR104SI.webp"; break;
-            case 35: img = "WR103SI.webp"; break;
-            case 25: case 32: case 38: img = "WR100SI_WR106SI.webp"; break;
-            case 26: case 39: img = "WR110MI.webp"; break;
-            case 40: img = "WR115MI.webp"; break;
-            case 48: img = "WR130E.webp"; break; // S300
-            case 49: img = "WR141E.webp"; break; // M500
-            case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
-            case 62: img = "WR147E.webp"; break; // L1000
-            case 67: img = "WR148E.webp"; break; // L800
-            case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
-            case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
-          }
+            switch( pid ) {
+              case 21: case 24: case 33: case 37: img = "WR101SI_WR105SI.webp"; break;
+              case 22: case 23: case 34: case 36: img = "WR102SI_WR104SI.webp"; break;
+              case 35: img = "WR103SI.webp"; break;
+              case 25: case 32: case 38: img = "WR100SI_WR106SI.webp"; break;
+              case 26: case 39: img = "WR110MI.webp"; break;
+              case 40: img = "WR115MI.webp"; break;
+              case 48: img = "WR130E.webp"; break; // S300
+              case 49: img = "WR141E.webp"; break; // M500
+              case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
+              case 62: img = "WR147E.webp"; break; // L1000
+              case 67: img = "WR148E.webp"; break; // L800
+              case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
+              case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
+              case 73: case 74: case 75: case 76:
+              case 84: case 85: case 86: case 87: img = "WR206E_WR208E_WR213E_WR216E.webp"; break; // Vision M/L
+            }
           break;
           case "KR":
-          switch( pid ) {
-            case 1: case 6: img = "KR100_KR101E.webp"; break;
-            case 2: case 3: case 7: img = "KR110_KR111_KR120E.webp"; break;
-            case 4: case 5: case 8: case 9: case 10: img = "KR112_KR113_KR121E_KR122E_KR123E.webp"; break;
-            case 11: case 12: img = "KR133E_KR136E.webp"; break;
-            case 13: case 16: case 25: case 26: img = "KR172E.webp"; break;
-            case 14: case 17: case 21: case 22: img = "KR173E_KR174E.webp"; break;
-            case 19: case 20: case 23: case 24: img = "KR233E_KR236E.webp"; break;
-          }
+            switch( pid ) {
+              case 1: case 6: img = "KR100_KR101.webp"; break;
+              case 2: case 3: case 7: img = "KR110_KR111_KR120.webp"; break;
+              case 4: case 5: case 8: case 9: case 10: img = "KR112_KR113_KR121_KR122_KR123.webp"; break;
+              case 11: case 12: img = "KR133_KR136.webp"; break;
+              case 13: case 16: case 25: case 26: case 27: img = "KR172.webp"; break;
+              case 14: case 17: case 21: case 22: case 28: case 29: img = "KR173_KR174.webp"; break;
+              case 19: case 20: case 23: case 24: case 30: case 31: img = "KR233_KR236.webp"; break;
+            }
           break;
           case "LX":
-          switch( pid ) {
-            case 8: img = "LX812i.webp"; break;
-            case 11: img = "LX796i.webp"; break;
-            case 13: img = "LX810i.webp"; break;
-            case 20: img = "LX835i.webp"; break;
-          }
+            switch( pid ) {
+              case 6: img = "LX790i.webp"; break;
+              case 8: img = "LX812i.webp"; break;
+              case 11: img = "LX796i.webp"; break;
+              case 13: img = "LX810i.webp"; break;
+              case 20: img = "LX835i.webp"; break;
+              case 26: img = "LX838i.webp"; break;
+            }
           break;
+          case "SM":
+            switch( pid ) {
+              case 1: img = "SM800.webp"; break;
+            }
+            break;
         }
       }
 

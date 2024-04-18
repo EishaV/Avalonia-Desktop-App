@@ -109,7 +109,7 @@
   <string name="cfg_mz_sp">SP [m]</string>
   <string name="cfg_mz_perc">Anteil</string>
   <string name="cfg_more">Weitere Einstellungen</string>
-  <string name="cfg_rain">Regenzeit</string>
+  <string name="cfg_rain">Regenverzögerung</string>
   <string name="cfg_torq">Drehmoment</string>
   <string name="cfg_save">Sichern...</string>
 
