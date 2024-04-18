@@ -160,9 +160,9 @@ namespace Positec {
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Nicht verwendete private Member entfernen", Justification = "<Ausstehend>")]
-    private async Task<bool> GetProductList() {
+    private async Task<bool> GetProductList() { // kann auch ohne Login im Browser angefragt werden
       try {
-        HttpResponseMessage response = await httpClient.GetAsync(UrlApi + "users/me");
+        HttpResponseMessage response = await httpClient.GetAsync(UrlApi + "producst");
         response.EnsureSuccessStatusCode();
         var str = await response.Content.ReadAsStringAsync();
 
