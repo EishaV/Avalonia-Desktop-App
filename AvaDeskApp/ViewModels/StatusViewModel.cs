@@ -152,7 +152,7 @@ namespace AvaApp.ViewModels {
               case 48: img = "WR130E.webp"; break; // S300
               case 49: img = "WR141E.webp"; break; // M500
               case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
-              case 62: img = "WR147E.webp"; break; // L1000
+              case 62: case 66: img = "WR147E.webp"; break; // L1000
               case 67: img = "WR148E.webp"; break; // L800
               case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
               case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
