@@ -37,7 +37,7 @@
         <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True"
                   MinHeight="30" Padding="0" Width="370" >
           <StackPanel Background="DarkBlue">
-            <Grid ColumnDefinitions="2*,2*,4*,4*,3*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
+            <Grid ColumnDefinitions="2*,2*,3*,3*,3*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
               <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize cfg_sc_dow}"/>
               <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize cfg_sc_cut}"/>
               <TextBlock Grid.Column="2" Classes="h1" Text="{tx:Localize cfg_sc_beg}"/>
@@ -52,7 +52,7 @@
               </ItemsControl.Styles>              
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Grid ColumnDefinitions="2*,2*,4*,4*,3*" RowDefinitions="27" ShowGridLines="True" Margin="0">
+                  <Grid ColumnDefinitions="2*,2*,3*,3*,3*" RowDefinitions="27" ShowGridLines="True" Margin="0">
                     <TextBlock Grid.Column="0" Text="{Binding Wday}"/>
                     <Viewbox Grid.Column="1">
                       <CheckBox IsChecked="{Binding Edge}" HorizontalAlignment="Center" />
