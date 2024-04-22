@@ -60,7 +60,9 @@ namespace AvaApp.ViewModels {
     public IImage? RsiPic { get; private set; }
 
     private void RefreshBase(DataBase d) {
-      string? bra = Client.Mowers[_idx].Product.BladeResetAt;
+      ProductItem pi = Client.Mowers[_idx].Product;
+      string? bra = pi.BladeResetAt;
+      bool bmt = pi.Endpoint != null && pi.Topic != null;
 
       Error = GetError(d.LastError); //this.RaisePropertyChanged(nameof(Error));
       ErrorColor = d.LastError == ErrorCode.RAINING ? Brushes.Aqua : Brushes.Red;
@@ -79,16 +81,16 @@ namespace AvaApp.ViewModels {
       CanBlade = true;
       StatDist = d.Statistic.Distance; StatWork = FormatTime(d.Statistic.WorkTime);
       IsCmdPollEnabled = true;
-      CanStart = d.LastState == StatusCode.HOME || d.LastState == StatusCode.PAUSE;
-      CanHome = d.LastState == StatusCode.GRASS_CUTTING || d.LastState == StatusCode.PAUSE;
-      CanStop = !(d.LastState == StatusCode.HOME || d.LastState == StatusCode.IDLE || d.LastState == StatusCode.PAUSE);
+      CanStart = bmt && (d.LastState == StatusCode.HOME || d.LastState == StatusCode.PAUSE);
+      CanHome = bmt && (d.LastState == StatusCode.GRASS_CUTTING || d.LastState == StatusCode.PAUSE);
+      CanStop = bmt && !(d.LastState == StatusCode.HOME || d.LastState == StatusCode.IDLE || d.LastState == StatusCode.PAUSE);
     }
     public void Refresh(object? o) {
       if( o is MqttP0 m && !string.IsNullOrEmpty(m.Cfg.Date) && !string.IsNullOrEmpty(m.Cfg.Time) ) {
         ConfigP0 c = m.Cfg;
         DataP0 d = m.Dat;
         string dts = $"{c.Date} {c.Time}"; // parsable DateTime string
-        ProductItem pi = MainWindowViewModel.Instance.Client.Mowers[MainWindowViewModel.Instance.MowIdx].Product;
+        ProductItem pi = Client.Mowers[MainWindowViewModel.Instance.MowIdx].Product;
 
         Stamp = DateTime.ParseExact(dts, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
         RefreshBase(d);
@@ -100,7 +102,7 @@ namespace AvaApp.ViewModels {
         }
         Firmware =  d.Firmware.ToString("N2", CultureInfo.InvariantCulture) + (d.Beta != null ? $"b{d.Beta}" : string.Empty);
 
-        CanMenu = c.Schedule.Ots != null && c.Schedule.Party != null;
+        CanMenu = pi.Endpoint != null && pi.Topic != null && c.Schedule.Ots != null && c.Schedule.Party != null;
         IsParty = c.Schedule.Mode == 2;
         if( IsParty ) State += " Party";
         CanEdge = d.LastState == StatusCode.HOME;

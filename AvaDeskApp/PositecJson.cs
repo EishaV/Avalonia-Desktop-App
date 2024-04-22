@@ -398,8 +398,8 @@ namespace Positec {
     [DataMember(Name = "name")] public string? Name { get; set; }
     [DataMember(Name = "locked")] public bool Locked { get; set; }
     [DataMember(Name = "firmware_auto_upgrade")] public bool AutoUpgd { get; set; }
-    [DataMember(Name = "mqtt_endpoint")] public string? Endpoint { get; set; }
-    [DataMember(Name = "mqtt_topics")] public MqttTopic Topic { get; set; }
+    [DataMember(Name = "mqtt_xendpoint")] public string? Endpoint { get; set; }
+    [DataMember(Name = "mqtt_Xtopics")] public MqttTopic? Topic { get; set; }
     [DataMember(Name = "online")] public bool Online { get; set; }
     [DataMember(Name = "protocol")] public int Protocol { get; set; }
     [DataMember(Name = "capabilities")] public List<string>? Capas { get; set; }

@@ -126,10 +126,29 @@ namespace AvaApp.ViewModels {
 
     public bool CanPoll => TabIdx == 0 || TabIdx == 2 || TabIdx == 3 || TabIdx == 4;
     public async void CmdPoll() {
-      if( Client != null && Client.Connected ) {
-        if( TabIdx == 3 ) await ActCmdCall();
-        else Client.Publish("", MowIdx);
-      }
+      if( Client != null ) {
+        if( Client.Connected ) {
+          if( TabIdx == 3 ) await ActCmdCall();
+          else Client.Publish("", MowIdx);
+        } else {
+          if( TabIdx == 3 ) await ActCmdCall();
+          else {
+            await Client.GetStatus(MowIdx);
+            if( client.Mowers[_MowIdx] is MowerP0 mo ) {
+              if( mo.Mqtt != null && !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+                StatusVM?.Refresh(mo.Mqtt);
+                ConfigVM?.Refresh(mo.Mqtt, true);
+              }
+            }
+            if( client.Mowers[_MowIdx] is MowerP1 mn ) {
+              if( mn.Mqtt != null || !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+                StatusVM?.Refresh(mn.Mqtt);
+                //ConfigVM.Refresh(mo.Mqtt, true);
+              }
+            }
+          }
+        }
+      } 
     }
 
     public bool CanTabCfg => 0 <= MowIdx && MowIdx < client.Mowers.Count 

@@ -438,40 +438,41 @@ namespace Positec {
       string? broker = Mowers[0].Product.Endpoint;
       int userid = Mowers[0].Product.UserId; // User.Id;
 
-      try {
-        var obp_tls = new MqttClientTlsOptions() {
-          UseTls = true,
-          SslProtocol = System.Security.Authentication.SslProtocols.Tls12,
-          AllowUntrustedCertificates = true,
-          IgnoreCertificateChainErrors = true,
-          IgnoreCertificateRevocationErrors = true,
-          ApplicationProtocols = [new System.Net.Security.SslApplicationProtocol("mqtt")]
-        };
-        obp_tls.CertificateValidationHandler += delegate { return true; };
+      if( broker != null ) {
+        try {
+          var obp_tls = new MqttClientTlsOptions() {
+            UseTls = true,
+            SslProtocol = System.Security.Authentication.SslProtocols.Tls12,
+            AllowUntrustedCertificates = true,
+            IgnoreCertificateChainErrors = true,
+            IgnoreCertificateRevocationErrors = true,
+            ApplicationProtocols = [new System.Net.Security.SslApplicationProtocol("mqtt")]
+          };
+          obp_tls.CertificateValidationHandler += delegate { return true; };
 
-        _mqttCOB = _mqttCOB.WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V311);
-        _mqttCOB = _mqttCOB.WithKeepAlivePeriod(TimeSpan.FromMinutes(5));
-        //_mqttCOB = _mqttCOB.WithNoKeepAlive();
-        _mqttCOB = _mqttCOB.WithTcpServer(broker, 443);
-        _mqttCOB = _mqttCOB.WithClientId($"{_api}/USER/{userid}/AvaDeskApp/{Uuid}");
-        _mqttCOB = _mqttCOB.WithTlsOptions(obp_tls);
-        _mqttCOB = _mqttCOB.WithCleanSession(true);
-      } catch( Exception ex ) {
-        Trace.TraceError($"Mqtt build {ex}");
-        return false;
-      }
+          _mqttCOB = _mqttCOB.WithProtocolVersion(MQTTnet.Formatter.MqttProtocolVersion.V311);
+          _mqttCOB = _mqttCOB.WithKeepAlivePeriod(TimeSpan.FromMinutes(5));
+          //_mqttCOB = _mqttCOB.WithNoKeepAlive();
+          _mqttCOB = _mqttCOB.WithTcpServer(broker, 443);
+          _mqttCOB = _mqttCOB.WithClientId($"{_api}/USER/{userid}/AvaDeskApp/{Uuid}");
+          _mqttCOB = _mqttCOB.WithTlsOptions(obp_tls);
+          _mqttCOB = _mqttCOB.WithCleanSession(true);
+        } catch( Exception ex ) {
+          Trace.TraceError($"Mqtt build {ex}");
+          return false;
+        }
 
-      try {
-        _mqtt.ApplicationMessageReceivedAsync += Mqtt_ApplicationMessageReceivedAsync;
-        _mqtt.DisconnectedAsync += Mqtt_DisconnectedAsync;
-        await ConnAndSub();
-        Trace.TraceInformation($"Connect '{broker} ({_mqtt.IsConnected})'");
-        //Publish("{}");
-      } catch( Exception ex ) {
-        Trace.TraceError($"Mqtt conn {ex}");
-        return false;
-      }
-
+        try {
+          _mqtt.ApplicationMessageReceivedAsync += Mqtt_ApplicationMessageReceivedAsync;
+          _mqtt.DisconnectedAsync += Mqtt_DisconnectedAsync;
+          await ConnAndSub();
+          Trace.TraceInformation($"Connect '{broker} ({_mqtt.IsConnected})'");
+          //Publish("{}");
+        } catch( Exception ex ) {
+          Trace.TraceError($"Mqtt conn {ex}");
+          return false;
+        }
+      } else Trace.TraceWarning($"Mqtt mower {Mowers[0].Product.Name} has no endpoint!");
       return true;
     }
 
@@ -493,10 +494,12 @@ namespace Positec {
       if( _mqtt.IsConnected ) _reTry = 0;
 
       foreach( MowerBase mb in Mowers ) {
-        string topic = mb.Product.Topic.CmdOut;
-
-        await _mqtt.SubscribeAsync(topic, MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
-        Trace.TraceInformation($"Mqtt subscribed to {topic}");
+        if( mb.Product.Topic is MqttTopic mt ) {
+          await _mqtt.SubscribeAsync(mt.CmdOut, MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
+          Trace.TraceInformation($"Mqtt subscribed to {mt.CmdOut}");
+        } else {
+          Trace.TraceWarning($"Mqtt {mb.Product.Name} has no topic!");
+        }
       }
     }
 
@@ -518,7 +521,7 @@ namespace Positec {
     Task Mqtt_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e) {
       string tpc = e.ApplicationMessage.Topic;
       string json = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-      int idx = Mowers.FindIndex((m) => m.Product.Topic.CmdOut == tpc);
+      int idx = Mowers.FindIndex((m) => m.Product.Topic?.CmdOut == tpc);
 
       Trace.TraceInformation($"Receive topic: {tpc}");
       Trace.TraceInformation($"Receive json: {json}");
@@ -546,7 +549,9 @@ namespace Positec {
     public void Exit() {
       if( _mqtt != null && _mqtt.IsConnected ) {
         _mqtt.ApplicationMessageReceivedAsync -= Mqtt_ApplicationMessageReceivedAsync;
-        foreach( MowerBase mb in Mowers ) _mqtt.UnsubscribeAsync(mb.Product.Topic.CmdOut);
+        foreach( MowerBase mb in Mowers ) {
+          if( mb.Product.Topic is MqttTopic mt ) _mqtt.UnsubscribeAsync(mt.CmdOut);
+        }
         _mqtt.DisconnectedAsync -= Mqtt_DisconnectedAsync;
         try { _mqtt.DisconnectAsync(MqttClientDisconnectOptionsReason.NormalDisconnection); } catch( Exception ex ) { Trace.TraceError($"Exit {ex}"); }
       }
@@ -554,20 +559,21 @@ namespace Positec {
 
     public bool Connected { get { return _mqtt != null && _mqtt.IsConnected; } }
     public void Publish(string s, int i) {
-      string topic = Mowers[i].Product.Topic.CmdIn;
-      string str = s.StartsWith('{') && s.EndsWith('}') ? s : '{' + s + '}';
-      var msg = new MqttApplicationMessageBuilder()
-                    .WithTopic(topic)
-                    .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
-                    .WithPayload(str).Build();
+      if( Mowers[i].Product.Topic is MqttTopic mt ) {
+        string str = s.StartsWith('{') && s.EndsWith('}') ? s : '{' + s + '}';
+        var msg = new MqttApplicationMessageBuilder()
+                      .WithTopic(mt.CmdIn)
+                      .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce)
+                      .WithPayload(str).Build();
 
-      try {
-        _mqtt.PublishAsync(msg);
-        Trace.TraceInformation($"Publish topic: {topic}");
-        Trace.TraceInformation($"Publish json: {str}");
-      } catch( Exception ex ) {
-        Trace.TraceError($"Publish {ex}");
-      }
+        try {
+          _mqtt.PublishAsync(msg);
+          Trace.TraceInformation($"Publish topic: {mt.CmdIn}");
+          Trace.TraceInformation($"Publish json: {str}");
+        } catch( Exception ex ) {
+          Trace.TraceError($"Publish {ex}");
+        }
+      } else Trace.TraceWarning($"Publish {Mowers[i].Product.Name} has no topic.");
     }
   }
 }
