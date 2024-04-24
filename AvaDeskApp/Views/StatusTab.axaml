@@ -13,8 +13,8 @@
     <Image Grid.Row="0" Source="{Binding WebPic}" Margin="10" />
     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,*,Auto,Auto" Margin="10 0 10 0">
       <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5" Spacing="10">
-        <TextBlock Text="{Binding Error}" Foreground="{Binding ErrorColor}" FontSize="20"/>
-        <TextBlock Text="{Binding State}" Foreground="{Binding StateColor}" FontSize="20"/>
+        <TextBlock Text="{Binding Error}" Foreground="{Binding ErrorColor}" FontSize="20" />
+        <TextBlock Text="{Binding State}" Foreground="{Binding StateColor}" FontSize="20" />
       </StackPanel>
       <Image Grid.Column="1" Grid.Row="0" Source="{Binding RsiPic}" />
       <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding LastZone}'}" />
@@ -117,7 +117,7 @@
         </Button.Flyout>
         <Image Source="/Assets/Menu.webp" Height="17"/>
       </Button>
-      <Button Command="{Binding CmdPoll}" IsEnabled="{Binding IsCmdPollEnabled}" HorizontalAlignment="Right">
+      <Button Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}" HorizontalAlignment="Right">
         <StackPanel Orientation="Horizontal" Spacing="5">
           <Image Source="/Assets/Refresh.webp" Height="16"/>
           <TextBlock Text="{tx:Localize state_poll}" />

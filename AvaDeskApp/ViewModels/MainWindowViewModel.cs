@@ -126,25 +126,18 @@ namespace AvaApp.ViewModels {
 
     public bool CanPoll => TabIdx == 0 || TabIdx == 2 || TabIdx == 3 || TabIdx == 4;
     public async void CmdPoll() {
-      if( Client != null ) {
-        if( Client.Connected ) {
-          if( TabIdx == 3 ) await ActCmdCall();
-          else Client.Publish("", MowIdx);
-        } else {
-          if( TabIdx == 3 ) await ActCmdCall();
+      if( TabIdx == 3 ) await ActCmdCall();
+      else {
+        if( Client != null ) {
+          if( Client.Connected ) Client.Publish("", MowIdx);
           else {
+            MowerBase mb = client.Mowers[MowIdx];
+
             await Client.GetStatus(MowIdx);
-            if( client.Mowers[_MowIdx] is MowerP0 mo ) {
-              if( mo.Mqtt != null && !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
-                StatusVM?.Refresh(mo.Mqtt);
-                ConfigVM?.Refresh(mo.Mqtt, true);
-              }
-            }
-            if( client.Mowers[_MowIdx] is MowerP1 mn ) {
-              if( mn.Mqtt != null || !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
-                StatusVM?.Refresh(mn.Mqtt);
-                //ConfigVM.Refresh(mo.Mqtt, true);
-              }
+            if( !string.IsNullOrEmpty(mb.Json) ) {
+              MqttJson = mb.Json;
+              if( mb is MowerP0 mo && mo.Mqtt != null ) StatusVM?.Refresh(mo.Mqtt);
+              if( mb is MowerP1 mn && mn.Mqtt != null ) StatusVM?.Refresh(mn.Mqtt);
             }
           }
         }
@@ -325,7 +318,7 @@ namespace AvaApp.ViewModels {
           if( mb.Product.Name != null ) MowNames.Add(mb.Product.Name);
         }
         this.RaisePropertyChanged(nameof(MowNames));
-        if( StatusVM != null ) StatusVM.IsCmdPollEnabled = true;
+        if( StatusVM != null ) StatusVM.CanPoll = client.Connected;
       }
       return b;
     }
@@ -344,6 +337,7 @@ namespace AvaApp.ViewModels {
       "\"tq\":0 - Torque normal => zero" ];
     public string MqttIn { get; set; }
 
+    public bool CanSend => client.Connected;
     public void MqttCmd() {
       if( !string.IsNullOrEmpty(MqttIn) ) {
         int p = MqttIn.IndexOf(" - ");

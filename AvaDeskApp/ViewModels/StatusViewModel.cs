@@ -68,8 +68,13 @@ namespace AvaApp.ViewModels {
       ErrorColor = d.LastError == ErrorCode.RAINING ? Brushes.Aqua : Brushes.Red;
       State = GetState(d.LastState, d.Battery.Charging, out ISolidColorBrush fc);
       StateColor = fc;
-      SetRssiPic(d.RecvSignal);
-      DmpPitch = d.Orient[0]; DmpRoll = d.Orient[1]; DmpYaw = d.Orient[2];
+      if( d.Conn == "BLE" ) {
+        var asset = AssetLoader.Open(new Uri($"{AvaAss}/bluetooth.png"));
+        RsiPic = new Bitmap(asset);
+      } else SetRssiPic(d.RecvSignal);
+      if( d.Orient != null && d.Orient.Length == 3 ) {
+        DmpPitch = d.Orient[0]; DmpRoll = d.Orient[1]; DmpYaw = d.Orient[2];
+      }
       BatPerc = d.Battery.Perc; BatVolt = d.Battery.Volt; BatTemp = d.Battery.Temp; BatCycle = d.Battery.Cycle;
       StatBlade = FormatTime(d.Statistic.Blade);
       BladeCur = FormatTime(d.Statistic.Blade - Client.Mowers[_idx].Product.BladeReset ?? 0);
@@ -80,7 +85,7 @@ namespace AvaApp.ViewModels {
       } else BladeAt = string.Empty;
       CanBlade = true;
       StatDist = d.Statistic.Distance; StatWork = FormatTime(d.Statistic.WorkTime);
-      IsCmdPollEnabled = true;
+      CanPoll = Client.Connected;
       CanStart = bmt && (d.LastState == StatusCode.HOME || d.LastState == StatusCode.PAUSE);
       CanHome = bmt && (d.LastState == StatusCode.GRASS_CUTTING || d.LastState == StatusCode.PAUSE);
       CanStop = bmt && !(d.LastState == StatusCode.HOME || d.LastState == StatusCode.IDLE || d.LastState == StatusCode.PAUSE);
@@ -270,14 +275,14 @@ namespace AvaApp.ViewModels {
     public async Task CmdBlade() {
       if( Client != null && Client.Connected ) await Client.ResetBlade(_idx);
     }
-    public bool IsCmdPollEnabled {
+    public bool CanPoll{
       get => _IsCmdPollEnabled;
       set => this.RaiseAndSetIfChanged(ref _IsCmdPollEnabled, value);
     }
     private bool _IsCmdPollEnabled;
     public void CmdPoll() {
       if( Client != null && Client.Connected ) {
-        IsCmdPollEnabled = false;
+        CanPoll = false;
         Client.Publish("", _idx);
       }
     }
