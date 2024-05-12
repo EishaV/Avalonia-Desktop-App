@@ -118,6 +118,6 @@
   <string name="act_state">Condition</string>
   <string name="act_poll">Rappel</string>
 
-  <string name="satus_error">Statut/Erreur</string>
+  <string name="status_error">Statut/Erreur</string>
   <string name="timestamp">"Date/Heures"</string>
 </resources>

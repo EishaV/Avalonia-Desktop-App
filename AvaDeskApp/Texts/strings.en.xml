@@ -118,6 +118,6 @@
   <string name="act_state">State</string>
   <string name="act_poll">Recall</string> 
 
-  <string name="satus_error">"Status/Error"</string>
+  <string name="status_error">"Status/Error"</string>
   <string name="timestamp">"Date/Time"</string>
 </resources>
