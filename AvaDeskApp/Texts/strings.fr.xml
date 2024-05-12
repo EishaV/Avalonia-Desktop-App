@@ -35,13 +35,13 @@
   <string name="mower_error_unreachable_zone">Zone inaccessible</string>
 
   <string name="mower_error_calibration_needed">Étalonnage nécessaire</string>
-  <string name="mower_error_camera_error">Kamerafehler</string>
-  <string name="mower_error_camera_lens_dirty">Camera lens is dirty</string>
-  <string name="mower_error_camera_low_light">Camera light too low</string>
-  <string name="mower_error_headlight_error">Kopflicht-Fehler</string>
-  <string name="mower_error_mapping_exploration_failed">Rasenerkundung fehlgeschlagen</string>
-  <string name="mower_error_mapping_exploration_required">Rasenerkundung erfordelich</string>
-  <string name="mower_error_rfid_reader_error">RFID Lesefehler</string>
+  <string name="mower_error_camera_error">Erreur de caméra</string>
+  <string name="mower_error_camera_lens_dirty">L'objectif de la caméra est sale</string>
+  <string name="mower_error_camera_low_light">Lumière de la caméra trop faible</string>
+  <string name="mower_error_headlight_error">Eclairage de tête</string>
+  <string name="mower_error_mapping_exploration_failed">L’exploration du gazon a échoué</string>
+  <string name="mower_error_mapping_exploration_required">Exploration du gazon nécessaire</string>
+  <string name="mower_error_rfid_reader_error">Erreur de lecture RFID</string>
     
   <string name="mower_area_search">Approche zonale</string>
   <string name="mower_area_training">Formation par zones</string>
@@ -56,22 +56,22 @@
   <string name="mower_rain_delay">Délai de pluie</string>
   <string name="mower_trapped">Libération</string>
   
-  <string name="mower_status_completable_map_training">Map training (completable)</string>
-  <string name="mower_status_firmware_upgrading">Upgrading firmware</string>
-  <string name="mower_status_map_downloading">Downloading map</string>
-  <string name="mower_status_map_processing">Processing map</string>
-  <string name="mower_status_mower_status_activate_sim">Activate SIM</string>
-  <string name="mower_status_mower_status_geo_fence_not_set">The geo-fence is not enabled</string>
-  <string name="mower_status_mower_status_missing_setup_location">Missing Mission position</string>
-  <string name="mower_status_mower_status_out_of_geo_fence">Mission is out of the geo-fence</string>
-  <string name="mower_status_mower_status_set_mower_location">Set Mission location to enable weather conditions</string>
-  <string name="mower_status_mower_status_sim_activation_error">SIM activation error</string>
-  <string name="mower_status_mower_status_sim_activation_in_progress">SIM activation in progress</string>
-  <string name="mower_status_mower_status_sim_expired">SIM contract has expired</string>
-  <string name="mower_status_mower_status_weather_info_unavailable">Weather info not available at this time</string>
-  <string name="mower_status_mower_status_weather_information_source">Weather information by OpenWeatherMap</string>
-  <string name="mower_status_not_completable_map_training">Map training (not completable)</string>
-  <string name="mower_status_pending_accessory_activation">%1$s activation in progress</string>
+  <string name="mower_status_completable_map_training">Formation cartographique (complet)</string>
+  <string name="mower_status_firmware_upgrading">Mise à niveau du micrologiciel</string>
+  <string name="mower_status_map_downloading">Téléchargement de la carte</string>
+  <string name="mower_status_map_processing">Traitement de la carte</string>
+  <string name="mower_status_mower_status_activate_sim">Activer la carte SIM</string>
+  <string name="mower_status_mower_status_geo_fence_not_set">La géo-clôture n'est pas activée</string>
+  <string name="mower_status_mower_status_missing_setup_location">Mission manquante</string>
+  <string name="mower_status_mower_status_out_of_geo_fence">La mission est hors de la barrière géographique</string>
+  <string name="mower_status_mower_status_set_mower_location">Définir l'emplacement de la mission pour activer les conditions météorologiques</string>
+  <string name="mower_status_mower_status_sim_activation_error">Erreur d'activation de la carte SIM</string>
+  <string name="mower_status_mower_status_sim_activation_in_progress">Activation SIM en cours..</string>
+  <string name="mower_status_mower_status_sim_expired">Le contrat SIM a expiré</string>
+  <string name="mower_status_mower_status_weather_info_unavailable">Les informations météo ne sont pas disponibles pour le moment</string>
+  <string name="mower_status_mower_status_weather_information_source">Informations météorologiques par OpenWeatherMap</string>
+  <string name="mower_status_not_completable_map_training">Formation sur la carte (non complétable)</string>
+  <string name="mower_status_pending_accessory_activation">%1$s activation en cours</string>
 
   <!-- Seulement dans AvaApp -->
   <string name="main_mower">Tondeuse</string>
@@ -81,7 +81,7 @@
   <string name="main_login">Enregistrement</string>
   <string name="main_wait">Patientez s'il-vous-plait</string>
 
-  <string name="state">Status</string>
+  <string name="state">Statut</string>
   <string name="state_daywork">Heures d'ouverture</string>
   <string name="state_accu">Accumulateur</string>
   <string name="state_pry">Angle de lacet</string>
@@ -92,7 +92,7 @@
   <string name="state_start">Commencer</string>
   <string name="state_home">Maison</string>
   <string name="state_stop">Arrêt</string>
-  <string name="state_party">Mode de fete</string>
+  <string name="state_party">Mode fête</string>
   <string name="state_edge">Coupe des bords</string>
   <string name="state_safe">Maison sûre</string>
   <string name="state_poll">Sondage</string>
@@ -101,8 +101,8 @@
   <string name="cfg_sc">Calendrier de tonte</string>
   <string name="cfg_sc_dow">Jour</string>
   <string name="cfg_sc_cut">Bord</string>
-  <string name="cfg_sc_beg">Commencer</string>
-  <string name="cfg_sc_min">Une longueur de temps</string>
+  <string name="cfg_sc_beg">Début</string>
+  <string name="cfg_sc_min">Durée (mn)</string>
   <string name="cfg_sc_end">Fin</string>
   <string name="cfg_sc_perc">Correction</string>
   <string name="cfg_mz">Multizone/Points de départ</string>
@@ -117,4 +117,7 @@
   <string name="act_stamp">Date Heure</string>
   <string name="act_state">Condition</string>
   <string name="act_poll">Rappel</string>
+
+  <string name="satus_error">Statut/Erreur</string>
+  <string name="timestamp">"Date/Heures"</string>
 </resources>

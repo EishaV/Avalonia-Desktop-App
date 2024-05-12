@@ -117,4 +117,8 @@
   <string name="act_stamp">Datum Zeit</string>
   <string name="act_state">Zustand</string>
   <string name="act_poll">Abrufen</string>
+
+  <string name="satus_error">"Status/Fehler"</string>
+  <string name="time stamp">"Zeitstempel"</string>
+  
 </resources>
