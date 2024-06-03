@@ -14,6 +14,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Enums;
@@ -21,6 +22,8 @@ using MsBox.Avalonia.Enums;
 using Plugin;
 using Positec;
 using AvaApp.Views;
+using Avalonia.Platform;
+using Avalonia.Styling;
 
 namespace AvaApp.ViewModels {
   [DataContract]
@@ -78,6 +81,24 @@ namespace AvaApp.ViewModels {
 
     public PositecApi Client => client;
     private readonly PositecApi client;
+
+    public IImage? ImgMode {
+      get {
+        const string AvaAss = "avares://AvaDeskApp/Assets";
+        Stream asset;
+        
+        if( Application.Current?.ActualThemeVariant == ThemeVariant.Dark ) asset = AssetLoader.Open(new Uri($"{AvaAss}/Sun.png"));
+        else asset = AssetLoader.Open(new Uri($"{AvaAss}/Moon.png"));
+        return new Bitmap(asset);
+      }
+    }
+    public void CmdMode() {
+      if( Application.Current is Application a ) {
+        if( a.ActualThemeVariant == ThemeVariant.Dark ) a.RequestedThemeVariant = ThemeVariant.Light;
+        else  a.RequestedThemeVariant = ThemeVariant.Dark;
+        this.RaisePropertyChanged(nameof(ImgMode));
+      }
+    }
 
     public List<string>? MowNames { get; set; }
     public int MowIdx {
