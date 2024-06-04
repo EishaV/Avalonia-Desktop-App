@@ -379,21 +379,22 @@ namespace AvaApp.ViewModels {
 
       public ActEntryVM(ActivityEntry ae) {
         ActivityData d = ae.Payload.Dat;
+        bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
 
         Stamp = DateTime.Parse(ae.Stamp).ToLocalTime().ToString(); // ae.Payload.Cfg.Date + " " + ae.Payload.Cfg.Time;
         if( d.LastError == ErrorCode.NONE ) {
           State = d.LastState.ToString();
           Color = d.LastState switch {
-            StatusCode.GRASS_CUTTING or StatusCode.BORDER_CUT => Brushes.Lime,
-            StatusCode.IDLE => Brushes.LightPink,
-            _ => Brushes.White,
+            StatusCode.GRASS_CUTTING or StatusCode.BORDER_CUT => b ? Brushes.Lime : Brushes.SeaGreen,
+            StatusCode.IDLE => b ? Brushes.LightPink : Brushes.DarkMagenta,
+            _ => b ? Brushes.White : Brushes.Black,
           };
         } else if( d.LastError == ErrorCode.RAINING ) {
           State = $"{d.LastState} {d.LastError}";
-          Color = Brushes.Aqua;
+          Color = b ? Brushes.Aqua : Brushes.Blue;
         } else {
           State = $"{d.LastError}";
-          Color = Brushes.LightCoral;
+          Color = b ? Brushes.LightCoral : Brushes.Red;
         }
         Charge = d.Battery.Charging == ChargeCoge.CHARGING ? "+" : "-";
         //li.SubItems.Add(a.Payload.Dat.Battery.Maintenance.ToString());

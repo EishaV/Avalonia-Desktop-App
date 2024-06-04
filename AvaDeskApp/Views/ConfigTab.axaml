@@ -9,6 +9,19 @@
   <Design.DataContext>
     <vm:ConfigTabViewModel/>
   </Design.DataContext>
+
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key='Back'>LightGray</SolidColorBrush>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key='Back'>DimGray</SolidColorBrush>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+    </ResourceDictionary>
+  </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="TextBlock">
       <Setter Property="VerticalAlignment" Value="Center"/>
@@ -36,7 +49,7 @@
       <StackPanel>
         <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True"
                   MinHeight="30" Padding="0" Width="370" >
-          <StackPanel Background="DarkBlue">
+          <StackPanel Background="{StaticResource Back}">
             <Grid ColumnDefinitions="2*,2*,3*,3*,3*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
               <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize cfg_sc_dow}"/>
               <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize cfg_sc_cut}"/>
@@ -103,7 +116,7 @@
 
         <Expander Header="{tx:Localize cfg_mz}" IsExpanded="False"
                   Width="370" MinHeight="30" Padding="0" >
-          <StackPanel Background="DarkSlateGray">
+          <StackPanel Background="{StaticResource Back}">
             <StackPanel Orientation="Horizontal" Height="25" Background="Silver">
               <TextBlock Text="{tx:Localize cfg_mz_sp}" Width="55" Classes="h1" />
               <TextBlock Text="0" Width="25" Classes="h1" Background="{Binding ZoneBack[0]}" />
@@ -144,7 +157,7 @@
 
         <Expander Header="{tx:Localize cfg_more}" IsExpanded="True"
                   Width="370" MinHeight="30" Padding="0" >
-          <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto">
+          <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" Background="{StaticResource Back}">
             <TextBlock Grid.Column="0" Grid.Row="0"
                        Text="{tx:Localize cfg_rain}" VerticalAlignment="Center" Margin="5 0 5 0" />
             <NumericUpDown Grid.Column="1" Grid.Row="0" Margin="0 2 0 2"
@@ -161,4 +174,5 @@
       </StackPanel>
     </ScrollViewer>
   </DockPanel>
+
 </UserControl>

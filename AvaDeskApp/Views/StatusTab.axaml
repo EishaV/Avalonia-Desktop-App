@@ -47,8 +47,8 @@
         <TextBlock Text="{Binding Stamp}"/>
       </StackPanel>
     </Grid>
-    <Border Grid.Row="1" Margin="5" Background="{DynamicResource Back}"
-            BorderBrush="Gray" BorderThickness="2" BoxShadow="2 2 2 2 Gray" CornerRadius="5" >
+    <Border Grid.Row="1" Margin="10 10 10 10" Background="{DynamicResource Back}"
+            BorderBrush="{DynamicResource Back}" BorderThickness="0" BoxShadow="0 0 10 5 Gray" CornerRadius="10" >
       <Grid Margin="5"
             ColumnDefinitions="Auto,*,*,,*" RowDefinitions="40,Auto,Auto,Auto,Auto,Auto">
         <Grid.Styles>
@@ -95,7 +95,7 @@
     <DockPanel Grid.Row="3" Margin="5" >
       <DockPanel.Styles>
         <Style Selector="Button">
-          <Setter Property="CornerRadius" Value="5"/>
+          <Setter Property="CornerRadius" Value="8"/>
           <Setter Property="Margin" Value="3 0"/>
           <Setter Property="Padding" Value="5"/>
         </Style>
