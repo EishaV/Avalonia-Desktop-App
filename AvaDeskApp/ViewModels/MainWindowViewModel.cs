@@ -24,6 +24,12 @@ using Positec;
 using AvaApp.Views;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Data.Converters;
+using Avalonia.Data;
+using System.Globalization;
+using CSScripting;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace AvaApp.ViewModels {
   [DataContract]
@@ -82,49 +88,13 @@ namespace AvaApp.ViewModels {
     public PositecApi Client => client;
     private readonly PositecApi client;
 
-    public IImage? ImgMode {
-      get {
-        const string AvaAss = "avares://AvaDeskApp/Assets";
-        Stream asset;
-        
-        if( Application.Current?.ActualThemeVariant == ThemeVariant.Dark ) asset = AssetLoader.Open(new Uri($"{AvaAss}/Sun.png"));
-        else asset = AssetLoader.Open(new Uri($"{AvaAss}/Moon.png"));
-        return new Bitmap(asset);
-      }
-    }
-    public void CmdMode() {
-      if( Application.Current is Application a ) {
-        if( a.ActualThemeVariant == ThemeVariant.Dark ) a.RequestedThemeVariant = ThemeVariant.Light;
-        else  a.RequestedThemeVariant = ThemeVariant.Dark;
-        this.RaisePropertyChanged(nameof(ImgMode));
-      }
-    }
-
     public List<string>? MowNames { get; set; }
     public int MowIdx {
       get => _MowIdx;
       set {
         _MowIdx = value;
-        if( 0 <= _MowIdx && _MowIdx < client.Mowers.Count && UsrApi != null ) {
-          StatusVM?.SetProductImage(UsrApi[..2], MowIdx);
-          if( client.Mowers[_MowIdx] is MowerP0 mo ) {
-            if( mo.Mqtt != null && !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
-              StatusVM?.Refresh(mo.Mqtt);
-              ConfigVM?.Refresh(mo.Mqtt, true);
-            }
-          }
-          if( client.Mowers[_MowIdx] is MowerP1 mn ) {
-            if( mn.Mqtt != null || !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
-              StatusVM?.Refresh(mn.Mqtt);
-              //ConfigVM.Refresh(mo.Mqtt, true);
-            }
-          }
-          this.RaisePropertyChanged(nameof(MowIdx));
-          this.RaisePropertyChanged(nameof(CanTabCfg));
-          MqttJson = client.Mowers[MowIdx].Json;
-          Activities.Clear();
-          //this.RaisePropertyChanged(nameof(Activities));
-        }
+        UpdateMqtt();
+        Activities.Clear();
       }
     }
     private int _MowIdx;
@@ -164,9 +134,29 @@ namespace AvaApp.ViewModels {
         }
       } 
     }
+    public void CmdMode() {
+      if( Application.Current is Application a ) {
+        if( a.ActualThemeVariant == ThemeVariant.Dark ) a.RequestedThemeVariant = ThemeVariant.Light;
+        else a.RequestedThemeVariant = ThemeVariant.Dark;
+        UpdateMqtt();
+        //if( TabIdx == 3 ) {
+        //  TabIdx = 0;
+        //  TabIdx = 3;
+        //  //Activities.ForEach(a => this.RaisePropertyChanged(nameof(a.Color)));
+        //}
+      }
+    }
 
     public bool CanTabCfg => 0 <= MowIdx && MowIdx < client.Mowers.Count 
                           && client.Mowers[MowIdx] is MowerP0;
+
+    public async Task ResetBlade() {
+      if( Client != null && Client.Connected ) await Client.ResetBlade(MowIdx);
+    }
+
+    public void Publish(string json) {
+      if( Client != null && Client.Connected ) Client.Publish(json, MowIdx);
+    }
 
     #region Constructor's
     private static readonly MainWindowViewModel _Instance;
@@ -266,11 +256,11 @@ namespace AvaApp.ViewModels {
       if( client != null && e.MowIdx == MowIdx ) {
         MqttJson = client.Mowers[MowIdx].Json;
         if( client.Mowers[_MowIdx] is MowerP0 mo) {
-          StatusVM?.Refresh(mo.Mqtt);
+          Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mo.Mqtt));
           Dispatcher.UIThread.InvokeAsync(() => ConfigVM?.Refresh(mo.Mqtt, false));
         }
         if(client.Mowers[_MowIdx] is MowerP1 mn) {
-          StatusVM?.Refresh(mn.Mqtt);
+          Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mn.Mqtt));
           //Dispatcher.UIThread.InvokeAsync(() => ConfigVM.Refresh(mo.Mqtt, false));
         }
       }
@@ -343,6 +333,28 @@ namespace AvaApp.ViewModels {
       }
       return b;
     }
+
+    private void UpdateMqtt() {
+      if( UsrApi != null && 0 <= _MowIdx && _MowIdx < client.Mowers.Count ) {
+        StatusVM?.UpdateProduct(UsrApi[..2], client.Mowers[MowIdx].Product);
+        if( client.Mowers[_MowIdx] is MowerP0 mo ) {
+          if( mo.Mqtt != null && !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+            StatusVM?.Refresh(mo.Mqtt);
+            ConfigVM?.Refresh(mo.Mqtt, true);
+          }
+        }
+        if( client.Mowers[_MowIdx] is MowerP1 mn ) {
+          if( mn.Mqtt != null || !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+            StatusVM?.Refresh(mn.Mqtt);
+            //ConfigVM.Refresh(mo.Mqtt, true);
+          }
+        }
+        this.RaisePropertyChanged(nameof(MowIdx));
+        this.RaisePropertyChanged(nameof(CanTabCfg));
+        MqttJson = client.Mowers[MowIdx].Json;
+        //this.RaisePropertyChanged(nameof(Activities));
+      }
+    }
     #endregion
 
     #region Tab Mqtt
@@ -370,33 +382,50 @@ namespace AvaApp.ViewModels {
     #endregion
 
     #region Tab Act
-    public class ActEntryVM {
+    public class ActEntryVM : INotifyPropertyChanged {
+      public event PropertyChangedEventHandler? PropertyChanged;
+
+      internal void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      }
+
+      enum ActColors { None, Gras, Idle, Rain, Error }
+
       public string Stamp { get; private set; }
       public string State { get; private set; }
       //public string Error { get; private set; }
       public string Charge { get; private set; }
-      public IBrush Color { get; private set; }
+
+      private ActColors _ac = ActColors.None;  
+      public IBrush? Color {
+        get {
+          bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+
+          return _ac switch {
+            ActColors.Gras => Brushes.Green,
+            ActColors.Idle => Brushes.Magenta,
+            ActColors.Rain => Brushes.Blue,
+            ActColors.Error => Brushes.Red,
+            _ => Brushes.Gray //b ? Brushes.White : Brushes.Black,
+          }; 
+        }
+      }
 
       public ActEntryVM(ActivityEntry ae) {
         ActivityData d = ae.Payload.Dat;
-        bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
 
         Stamp = DateTime.Parse(ae.Stamp).ToLocalTime().ToString(); // ae.Payload.Cfg.Date + " " + ae.Payload.Cfg.Time;
+        Charge = d.Battery.Charging == ChargeCoge.CHARGING ? "+" : "-";
         if( d.LastError == ErrorCode.NONE ) {
-          State = d.LastState.ToString();
-          Color = d.LastState switch {
-            StatusCode.GRASS_CUTTING or StatusCode.BORDER_CUT => b ? Brushes.Lime : Brushes.SeaGreen,
-            StatusCode.IDLE => b ? Brushes.LightPink : Brushes.DarkMagenta,
-            _ => b ? Brushes.White : Brushes.Black,
-          };
-        } else if( d.LastError == ErrorCode.RAINING ) {
-          State = $"{d.LastState} {d.LastError}";
-          Color = b ? Brushes.Aqua : Brushes.Blue;
+          State = $"{d.LastState}";
+          if( d.LastState == StatusCode.GRASS_CUTTING || d.LastState == StatusCode.BORDER_CUT ) _ac = ActColors.Gras;
+          else if( d.LastState == StatusCode.IDLE ) _ac = ActColors.Idle;
+          else _ac = ActColors.None;
         } else {
           State = $"{d.LastError}";
-          Color = b ? Brushes.LightCoral : Brushes.Red;
+          if( d.LastError == ErrorCode.RAINING ) _ac = ActColors.Rain;
+          else _ac = ActColors.Error;
         }
-        Charge = d.Battery.Charging == ChargeCoge.CHARGING ? "+" : "-";
         //li.SubItems.Add(a.Payload.Dat.Battery.Maintenance.ToString());
         //li.ToolTipText = a.Stamp;
       }
@@ -442,3 +471,49 @@ namespace AvaApp.ViewModels {
     }
   }
 }
+
+
+/*
+  <Setter Property="Foreground" Value="{Binding ActColor, Converter={x:Static vm:MainWindowViewModel.ActColorConverter}}" />
+  public static FuncValueConverter<string?, IBrush> ActColorConverter { get; } = new FuncValueConverter<string?, IBrush>(ac => {
+    bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+
+    return ac switch {
+      "Gras" => b ? Brushes.Magenta : Brushes.Green,
+      "Idle" => b ? Brushes.LightPink : Brushes.Yellow,
+      "Rain" => b ? Brushes.Aqua : Brushes.Blue,
+      "Error" => b ? Brushes.LightCoral : Brushes.Red,
+      _ => b ? Brushes.White : Brushes.Black,
+    };
+  }); // new FuncValueConverter<string?, IBrush>(num => $"Your number is: '{num}'");
+
+
+  <DataGrid.Resources>
+    <vm:ActLogConverter x:Key="ALC"/>
+  </DataGrid.Resources>
+  <Setter Property="Foreground" Value="{Binding ActColor, Converter={StaticResource ALC}}" />
+  public class ActLogConverter : IValueConverter {
+    public static readonly ActLogConverter Instance = new ();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) {
+      bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+
+      if( value is string s && targetType.IsAssignableTo(typeof(IBrush)) ) {
+        return s switch {
+          "Gras" => b ? Brushes.Lime : Brushes.Green,
+          "Idle" => b ? Brushes.LightPink : Brushes.DarkMagenta,
+          "Rain" => b ? Brushes.Aqua : Brushes.Blue,
+          "Error" => b ? Brushes.LightCoral : Brushes.Red,
+          _ => b ? Brushes.White : Brushes.Black,
+        };
+      }
+      // converter used for the wrong type
+      return new BindingNotification(new InvalidCastException(), BindingErrorType.Error);
+    }
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) {
+      throw new NotSupportedException();
+    }
+  }
+
+*/

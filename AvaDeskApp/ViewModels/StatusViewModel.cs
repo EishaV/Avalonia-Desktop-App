@@ -12,13 +12,13 @@ using ReactiveUI;
 
 using Positec;
 using AvaApp.Texts;
+using Avalonia.Styling;
 
 namespace AvaApp.ViewModels {
   public class StatusViewModel : ReactiveObject {
     const string AvaAss = "avares://AvaDeskApp/Assets";
-    private int _idx;
 
-    internal static PositecApi Client => MainWindowViewModel.Instance.Client;
+    static MainWindowViewModel Main => MainWindowViewModel.Instance;
 
     public string Error { get; set; } = string.Empty;
     public IBrush ErrorColor { get; set; } = Brushes.Red;
@@ -51,6 +51,8 @@ namespace AvaApp.ViewModels {
 
     public string? Firmware { get; private set; }
 
+    private ProductItem? _pi = null;
+
     private IImage? _WebPic;
     public IImage? WebPic {
       get => _WebPic;
@@ -60,9 +62,8 @@ namespace AvaApp.ViewModels {
     public IImage? RsiPic { get; private set; }
 
     private void RefreshBase(DataBase d) {
-      ProductItem pi = Client.Mowers[_idx].Product;
-      string? bra = pi.BladeResetAt;
-      bool bmt = pi.Endpoint != null && pi.Topic != null;
+      string? bra = _pi?.BladeResetAt;
+      bool bmt = _pi?.Endpoint != null && _pi?.Topic != null;
 
       Error = GetError(d.LastError); //this.RaisePropertyChanged(nameof(Error));
       ErrorColor = d.LastError == ErrorCode.RAINING ? Brushes.Aqua : Brushes.Red;
@@ -77,7 +78,7 @@ namespace AvaApp.ViewModels {
       }
       BatPerc = d.Battery.Perc; BatVolt = d.Battery.Volt; BatTemp = d.Battery.Temp; BatCycle = d.Battery.Cycle;
       StatBlade = FormatTime(d.Statistic.Blade);
-      BladeCur = FormatTime(d.Statistic.Blade - Client.Mowers[_idx].Product.BladeReset ?? 0);
+      BladeCur =  FormatTime(d.Statistic.Blade - _pi?.BladeReset ?? 0);
       if( bra != null ) {
         DateTime dt = DateTime.Parse(bra);
 
@@ -85,7 +86,7 @@ namespace AvaApp.ViewModels {
       } else BladeAt = string.Empty;
       CanBlade = true;
       StatDist = d.Statistic.Distance; StatWork = FormatTime(d.Statistic.WorkTime);
-      CanPoll = Client.Connected;
+      CanPoll = true;
       CanStart = bmt && (d.LastState == StatusCode.HOME || d.LastState == StatusCode.PAUSE);
       CanHome = bmt && (d.LastState == StatusCode.GRASS_CUTTING || d.LastState == StatusCode.PAUSE);
       CanStop = bmt && !(d.LastState == StatusCode.HOME || d.LastState == StatusCode.IDLE || d.LastState == StatusCode.PAUSE);
@@ -95,7 +96,6 @@ namespace AvaApp.ViewModels {
         ConfigP0 c = m.Cfg;
         DataP0 d = m.Dat;
         string dts = $"{c.Date} {c.Time}"; // parsable DateTime string
-        ProductItem pi = Client.Mowers[MainWindowViewModel.Instance.MowIdx].Product;
 
         Stamp = DateTime.ParseExact(dts, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
         RefreshBase(d);
@@ -107,11 +107,11 @@ namespace AvaApp.ViewModels {
         }
         Firmware =  d.Firmware.ToString("N2", CultureInfo.InvariantCulture) + (d.Beta != null ? $"b{d.Beta}" : string.Empty);
 
-        CanMenu = pi.Endpoint != null && pi.Topic != null && c.Schedule.Ots != null && c.Schedule.Party != null;
+        CanMenu = _pi?.Endpoint != null && _pi?.Topic != null && c.Schedule.Ots != null && c.Schedule.Party != null;
         IsParty = c.Schedule.Mode == 2;
         if( IsParty ) State += " Party";
         CanEdge = d.LastState == StatusCode.HOME;
-        VisSafe = pi.Capas?.Contains("safe_go_home") ?? false;
+        VisSafe = _pi?.Capas?.Contains("safe_go_home") ?? false;
         CanSafe = d.LastState == StatusCode.GRASS_CUTTING;
       } else if( o is MqttP1 mn && !string.IsNullOrEmpty(mn.Dat.Stamp) ) {
         DataP1 d = mn.Dat;
@@ -140,64 +140,63 @@ namespace AvaApp.ViewModels {
       RsiPic = new Bitmap(asset);
     }
 
-    public void SetProductImage(string? api, int idx) {
-      string img = "Landroid.png";
+    public void UpdateProduct(string api, ProductItem pi) {
+      string img = string.Empty;
+      int pid = pi.ProductId;
 
-      _idx = idx;
-      if( api != null && Client != null ) {
-        int pid = Client.Mowers[idx].Product.ProductId;
-
-        switch( api ) {
-          case "WX":
-            switch( pid ) {
-              case 21: case 24: case 33: case 37: img = "WR101SI_WR105SI.webp"; break;
-              case 22: case 23: case 34: case 36: img = "WR102SI_WR104SI.webp"; break;
-              case 35: img = "WR103SI.webp"; break;
-              case 25: case 32: case 38: img = "WR100SI_WR106SI.webp"; break;
-              case 26: case 39: img = "WR110MI.webp"; break;
-              case 40: img = "WR115MI.webp"; break;
-              case 48: img = "WR130E.webp"; break; // S300
-              case 49: img = "WR141E.webp"; break; // M500
-              case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
-              case 62: case 66: img = "WR147E.webp"; break; // L1000
-              case 67: img = "WR148E.webp"; break; // L800
-              case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
-              case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
-              case 73: case 74: case 75: case 76:
-              case 84: case 85: case 86: case 87: img = "WR206E_WR208E_WR213E_WR216E.webp"; break; // Vision M/L
-            }
+      _pi = pi;
+      switch( api ) {
+        case "WX":
+          switch( pid ) {
+            case 21: case 24: case 33: case 37: img = "WR101SI_WR105SI.webp"; break;
+            case 22: case 23: case 34: case 36: img = "WR102SI_WR104SI.webp"; break;
+            case 35: img = "WR103SI.webp"; break;
+            case 25: case 32: case 38: img = "WR100SI_WR106SI.webp"; break;
+            case 26: case 39: img = "WR110MI.webp"; break;
+            case 40: img = "WR115MI.webp"; break;
+            case 48: img = "WR130E.webp"; break; // S300
+            case 49: img = "WR141E.webp"; break; // M500
+            case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
+            case 62: case 66: img = "WR147E.webp"; break; // L1000
+            case 67: img = "WR148E.webp"; break; // L800
+            case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
+            case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
+            case 73: case 74: case 75: case 76:
+            case 84: case 85: case 86: case 87: img = "WR206E_WR208E_WR213E_WR216E.webp"; break; // Vision M/L
+          }
+        break;
+        case "KR":
+          switch( pid ) {
+            case 1: case 6: img = "KR100_KR101.webp"; break;
+            case 2: case 3: case 7: img = "KR110_KR111_KR120.webp"; break;
+            case 4: case 5: case 8: case 9: case 10: img = "KR112_KR113_KR121_KR122_KR123.webp"; break;
+            case 11: case 12: img = "KR133_KR136.webp"; break;
+            case 13: case 16: case 25: case 26: case 27: img = "KR172.webp"; break;
+            case 14: case 17: case 21: case 22: case 28: case 29: img = "KR173_KR174.webp"; break;
+            case 19: case 20: case 23: case 24: case 30: case 31: img = "KR233_KR236.webp"; break;
+          }
+        break;
+        case "LX":
+          switch( pid ) {
+            case 6: img = "LX790i.webp"; break;
+            case 8: img = "LX812i.webp"; break;
+            case 11: img = "LX796i.webp"; break;
+            case 13: img = "LX810i.webp"; break;
+            case 20: img = "LX835i.webp"; break;
+            case 26: img = "LX838i.webp"; break;
+          }
+        break;
+        case "SM":
+          switch( pid ) {
+            case 1: img = "SM800.webp"; break;
+          }
           break;
-          case "KR":
-            switch( pid ) {
-              case 1: case 6: img = "KR100_KR101.webp"; break;
-              case 2: case 3: case 7: img = "KR110_KR111_KR120.webp"; break;
-              case 4: case 5: case 8: case 9: case 10: img = "KR112_KR113_KR121_KR122_KR123.webp"; break;
-              case 11: case 12: img = "KR133_KR136.webp"; break;
-              case 13: case 16: case 25: case 26: case 27: img = "KR172.webp"; break;
-              case 14: case 17: case 21: case 22: case 28: case 29: img = "KR173_KR174.webp"; break;
-              case 19: case 20: case 23: case 24: case 30: case 31: img = "KR233_KR236.webp"; break;
-            }
-          break;
-          case "LX":
-            switch( pid ) {
-              case 6: img = "LX790i.webp"; break;
-              case 8: img = "LX812i.webp"; break;
-              case 11: img = "LX796i.webp"; break;
-              case 13: img = "LX810i.webp"; break;
-              case 20: img = "LX835i.webp"; break;
-              case 26: img = "LX838i.webp"; break;
-            }
-          break;
-          case "SM":
-            switch( pid ) {
-              case 1: img = "SM800.webp"; break;
-            }
-            break;
-        }
       }
 
-      var asset = AssetLoader.Open(new Uri($"{AvaAss}/{img}"));
-      WebPic = new Bitmap(asset);
+      if( !string.IsNullOrEmpty(img) ) {
+        var asset = AssetLoader.Open(new Uri($"{AvaAss}/{img}"));
+        WebPic = new Bitmap(asset);
+      }
     }
 
     private static string GetError(ErrorCode ec) {
@@ -242,38 +241,40 @@ namespace AvaApp.ViewModels {
       };
     }
     private static string GetState(StatusCode sc, ChargeCoge cc, out ISolidColorBrush c) {
+      bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+
+      c = b ? Brushes.LightGray : Brushes.DimGray;
       switch( sc ) {
-        case StatusCode.GRASS_CUTTING: c = Brushes.Lime; return Ressource.Get("mower_mowing");
+        case StatusCode.GRASS_CUTTING: c = b ? Brushes.LawnGreen : Brushes.DarkGreen; return Ressource.Get("mower_mowing");
         case StatusCode.HOME:
-        if( cc == ChargeCoge.CHARGING ) { c = Brushes.LawnGreen; return Ressource.Get("mower_charging"); }
-        else { c = Brushes.Bisque; return Ressource.Get("mower_home"); }
-        case StatusCode.IDLE: c = Brushes.Pink; return Ressource.Get("mower_idle");
-        case StatusCode.PAUSE: c = Brushes.Aqua; return Ressource.Get("mower_pause");
+          if( cc == ChargeCoge.CHARGING ) { c = b ? Brushes.Cyan : Brushes.Navy; return Ressource.Get("mower_charging"); } else return Ressource.Get("mower_home");
+        case StatusCode.IDLE: c = Brushes.Red; return Ressource.Get("mower_idle");
+        case StatusCode.PAUSE: c = b ? Brushes.Magenta : Brushes.Purple; return Ressource.Get("mower_pause");
 
         case StatusCode.START_SEQUENCE:
-        case StatusCode.LEAVE_HOUSE: c = Brushes.Yellow; return Ressource.Get("mower_leaving_home");
+        case StatusCode.LEAVE_HOUSE: return Ressource.Get("mower_leaving_home");
 
         case StatusCode.FOLLOW_WIRE:
         case StatusCode.SEARCHING_WIRE:
         case StatusCode.SEARCHING_HOME:
         case StatusCode.RTK_GOING_HOME:
-        case StatusCode.GOING_HOME: c = Brushes.Yellow; return Ressource.Get("mower_going_home");
+        case StatusCode.GOING_HOME: return Ressource.Get("mower_going_home");
         case StatusCode.RTK_MOVE_TO_ZONE:
-        case StatusCode.AREA_SEARCH: c = Brushes.Yellow; return Ressource.Get("mower_area_search");
-        case StatusCode.AREA_TRAINING: c = Brushes.Yellow; return Ressource.Get("mower_area_training");
-        case StatusCode.BORDER_CUT: c = Brushes.Yellow; return Ressource.Get("mower_border_cut");
+        case StatusCode.AREA_SEARCH: return Ressource.Get("mower_area_search");
+        case StatusCode.AREA_TRAINING: return Ressource.Get("mower_area_training");
+        case StatusCode.BORDER_CUT: return Ressource.Get("mower_border_cut");
 
         case StatusCode.LIFT_RECOVERY:
         case StatusCode.TRAPPED_RECOVERY:
-        case StatusCode.BLADE_BLOCKED_RECOVERY: c = Brushes.Orange; return Ressource.Get("mower_trapped");
+        case StatusCode.BLADE_BLOCKED_RECOVERY: c = b ? Brushes.Orange : Brushes.DarkOrange; return Ressource.Get("mower_trapped");
         default: c = Brushes.Red; return $"Unknown ls {sc}";
       }
     }
 
     #region Commands
     public bool CanBlade { get; set; }
-    public async Task CmdBlade() {
-      if( Client != null && Client.Connected ) await Client.ResetBlade(_idx);
+    public static async Task CmdBlade() {
+      await Main.ResetBlade();
     }
     public bool CanPoll{
       get => _IsCmdPollEnabled;
@@ -281,23 +282,24 @@ namespace AvaApp.ViewModels {
     }
     private bool _IsCmdPollEnabled;
     public void CmdPoll() {
-      if( Client != null && Client.Connected ) {
-        CanPoll = false;
-        Client.Publish("", _idx);
-      }
+      CanPoll = false;
+      Main.Publish($"\"cmd\":{(int)Command.PING}");
     }
 
     public bool CanStart { get; set; }
     public void CmdStart() {
-      if( Client != null && Client.Connected ) Client.Publish("\"cmd\":1", _idx);
+      CanPoll = false;
+      Main.Publish($"\"cmd\":{(int)Command.START}");
     }
     public bool CanStop { get; set; }
     public void CmdStop() {
-      if( Client != null && Client.Connected ) Client.Publish("\"cmd\":2", _idx);
+      CanPoll = false;
+      Main.Publish($"\"cmd\":{(int)Command.STOP}");
     }
     public bool CanHome { get; set; }
     public void CmdHome() {
-      if( Client != null && Client.Connected ) Client.Publish("\"cmd\":3", _idx);
+      CanPoll = false;
+      Main.Publish($"\"cmd\":{(int)Command.HOME}");
     }
     #endregion
 
@@ -313,34 +315,28 @@ namespace AvaApp.ViewModels {
     public bool IsParty { get; set; }
     public void CmdParty() {
       HideMenu();
-      if( Client != null && Client.Connected ) {
-        string cmd = $"\"id\":2,\"sc\":{{\"m\":{(IsParty ? 2 : 1)},\"distm\":0}}"; // id:2 damit Cfg refresht wird
+      string cmd = $"\"id\":2,\"sc\":{{\"m\":{(IsParty ? 2 : 1)},\"distm\":0}}"; // id:2 damit Cfg refresht wird
 
-        Client.Publish(cmd, _idx);
-      }
+      MainWindowViewModel.Instance.Publish(cmd);
     }
     public bool CanEdge { get; set; }
     public void CmdEdge() {
       HideMenu();
-      if( Client != null && Client.Connected ) {
-        string cmd = "\"sc\":{\"ots\":{\"bc\":1,\"wtm\":0}}";
-
-        Client.Publish(cmd, _idx);
-      }
+      CanPoll = false;
+      Main.Publish("\"sc\":{\"ots\":{\"bc\":1,\"wtm\":0}}");
     }
     public bool VisSafe { get; set; }
     public bool CanSafe { get; set; }
     public void CmdSafe() {
       HideMenu();
-      if( Client != null && Client.Connected ) {
-        string cmd = $"\"cmd\":{(int)Command.SAFE_HOMING}";
-
-        Client.Publish(cmd, _idx);
-      }
+      CanPoll = false;
+      Main.Publish($"\"cmd\":{(int)Command.SAFE_HOMING}");
     }
     #endregion
     public StatusViewModel() {
-      SetProductImage(null, 0);
+      var asset = AssetLoader.Open(new Uri($"{AvaAss}/Landroid.png"));
+
+      WebPic = new Bitmap(asset);
       if( Design.IsDesignMode ) {
         BatPerc = 100.0F; BatVolt = 20.5F; BatTemp = 36.0F;
         DmpPitch = DmpRoll = DmpYaw = 17.3;

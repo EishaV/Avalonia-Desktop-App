@@ -80,7 +80,7 @@ namespace Positec {
     PING = 0,
     START = 1,
     STOP = 2,
-    REQ = 3,
+    HOME = 3,
     ZONE_SEARCH_REQ = 4,
     LOCK = 5,
     UNLOCK = 6,

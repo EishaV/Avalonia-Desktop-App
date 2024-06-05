@@ -24,7 +24,7 @@
           <SolidColorBrush x:Key='Back'>LightGray</SolidColorBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key='Back'>DimGray</SolidColorBrush>
+          <SolidColorBrush x:Key='Back'>DarkGray</SolidColorBrush>
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -129,8 +129,7 @@
 
       <TabItem Header="{tx:Localize act}">
         <Grid ColumnDefinitions="*" RowDefinitions="*,Auto">
-          <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="False"
-                    RowHeight="20" >
+          <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="False" RowHeight="20" >
             <DataGrid.Styles>
               <Style Selector="DataGridRow">
                 <Setter Property="Foreground" Value="{Binding Color}" />
