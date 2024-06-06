@@ -224,8 +224,7 @@ namespace AvaApp.ViewModels {
         bool b = true;
 
         SchedulerD.ToList().ForEach(se => b = b && se.IsValid);
-        return b && mw.Client != null && mw.Client.Connected && mw.MowIdx != -1
-               && mw.Client.Mowers[mw.MowIdx] != null && mw.Client.Mowers[mw.MowIdx] is MowerP0;
+        return b && mw.Online;
       }
     }
 
@@ -293,7 +292,7 @@ namespace AvaApp.ViewModels {
         ButtonResult br = await msgbox.ShowWindowDialogAsync(desktop.MainWindow);
 
         if( br == ButtonResult.Ok ) {
-          MainWindowViewModel.Instance.Client.Publish(json, MainWindowViewModel.Instance.MowIdx);
+          MainWindowViewModel.Instance.Publish(json);
         }
       }
     }

@@ -85,7 +85,6 @@ namespace AvaApp.ViewModels {
       }
     }
 
-    public PositecApi Client => client;
     private readonly PositecApi client;
 
     public List<string>? MowNames { get; set; }
@@ -115,16 +114,18 @@ namespace AvaApp.ViewModels {
     public ConfigTabViewModel ConfigVM { get; }
     public PluginTabViewModel? PluginVM { get; }
 
+    public bool Online => client != null && client.Connected && 0 <= MowIdx && MowIdx < client.Mowers.Count && client.Mowers[MowIdx].Product.Online;
+
     public bool CanPoll => TabIdx == 0 || TabIdx == 2 || TabIdx == 3 || TabIdx == 4;
     public async void CmdPoll() {
       if( TabIdx == 3 ) await ActCmdCall();
       else {
-        if( Client != null ) {
-          if( Client.Connected ) Client.Publish("", MowIdx);
+        if( client != null ) {
+          if( client.Connected ) client.Publish("", MowIdx);
           else {
             MowerBase mb = client.Mowers[MowIdx];
 
-            await Client.GetStatus(MowIdx);
+            await client.GetStatus(MowIdx);
             if( !string.IsNullOrEmpty(mb.Json) ) {
               MqttJson = mb.Json;
               if( mb is MowerP0 mo && mo.Mqtt != null ) StatusVM?.Refresh(mo.Mqtt);
@@ -151,11 +152,11 @@ namespace AvaApp.ViewModels {
                           && client.Mowers[MowIdx] is MowerP0;
 
     public async Task ResetBlade() {
-      if( Client != null && Client.Connected ) await Client.ResetBlade(MowIdx);
+      if( client != null && client.Connected ) await client.ResetBlade(MowIdx);
     }
 
     public void Publish(string json) {
-      if( Client != null && Client.Connected ) Client.Publish(json, MowIdx);
+      if( client != null && client.Connected ) client.Publish(json, MowIdx);
     }
 
     #region Constructor's
@@ -253,7 +254,7 @@ namespace AvaApp.ViewModels {
 
     #region Events
     private void Client_RecvMqtt(object? sender, RecvEventArgs e) {
-      if( client != null && e.MowIdx == MowIdx ) {
+      if( client != null && e.Idx == MowIdx ) {
         MqttJson = client.Mowers[MowIdx].Json;
         if( client.Mowers[_MowIdx] is MowerP0 mo) {
           Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mo.Mqtt));
@@ -264,7 +265,7 @@ namespace AvaApp.ViewModels {
           //Dispatcher.UIThread.InvokeAsync(() => ConfigVM.Refresh(mo.Mqtt, false));
         }
       }
-      PluginVM?.ToDo(e.MowIdx);
+      PluginVM?.ToDo(e.Idx);
     }
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {
@@ -276,10 +277,10 @@ namespace AvaApp.ViewModels {
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
-      if(File.Exists(PositecApi.TokenFile) && UsrApi != null) {
+      if(UsrApi != null) {
         string api = UsrApi[..2];
 
-        if(await client.Access(api) && client.Mowers.Count > 0) {
+        if(File.Exists(PositecApi.TokenFile(api)) && await client.Access(api) && client.Mowers.Count > 0) {
           Trace.TraceInformation($"Main.Open Acc => {sw.ElapsedMilliseconds}");
           if(await StartMqtt()) {
             int mi = 0;
@@ -399,7 +400,7 @@ namespace AvaApp.ViewModels {
       private ActColors _ac = ActColors.None;  
       public IBrush? Color {
         get {
-          bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+          //bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
 
           return _ac switch {
             ActColors.Gras => Brushes.Green,

@@ -101,7 +101,9 @@ namespace Positec {
   }
 
   public class RecvEventArgs : EventArgs {
-    public int MowIdx { get; set; }
+    public string? Api { get; set; }
+    public string? Name { get; set; }
+    public int Idx { get; set; }
   }
   public class PositecApi {
     private readonly HttpClient httpClient = new();
@@ -123,7 +125,7 @@ namespace Positec {
     public static string DirData => Path.Combine(AppContext.BaseDirectory, "Data");
     public static string DirTrace => Path.Combine(AppContext.BaseDirectory, "Trace");
 
-    public static string TokenFile => Path.Combine(DirData, $"Token.json");
+    public static string TokenFile(string api) => Path.Combine(DirData, $"Token.{api}.json");
     public string Uuid { get; set; }
 
     public List<MowerBase> Mowers = [];
@@ -317,7 +319,7 @@ namespace Positec {
             Trace.TraceInformation($"Oauth token: {content}");
             if( Json.Read<OAuth>(content) is OAuth oa ) {
               _oAuth = oa;
-              File.WriteAllText(TokenFile, content);
+              File.WriteAllText(TokenFile(api), content);
               httpClient.DefaultRequestHeaders.Clear();
               httpClient.DefaultRequestHeaders.Add("Authorization", $"{_oAuth.Type} {_oAuth.Access}");
               _tokDT = DateTime.Now;
@@ -339,16 +341,16 @@ namespace Positec {
     }
 
     public async Task<bool> Access(string api) {
-      if( InitApi(api) && File.Exists(TokenFile) ) {
+      if( InitApi(api) && File.Exists(TokenFile(api)) ) {
         try {
-          string str = File.ReadAllText(TokenFile);
+          string str = File.ReadAllText(TokenFile(api));
 
           if( Json.Read<OAuth>(str) is OAuth oa ) _oAuth = oa;
         } catch( Exception ex ) {
           Trace.TraceError($"Access({api}) => {ex}");
           return false;
         }
-        _tokDT = File.GetLastWriteTime(TokenFile);
+        _tokDT = File.GetLastWriteTime(TokenFile(api));
         httpClient.DefaultRequestHeaders.Clear();
         httpClient.DefaultRequestHeaders.Add("Authorization", $"{_oAuth.Type} {_oAuth.Access}"); // wird ggf gleich wieder überschrieben
         if( !await CheckToken() ) return false;
@@ -374,7 +376,7 @@ namespace Positec {
           Trace.TraceInformation($"Refresh token: {content}");
           if( Json.Read<OAuth>(content) is OAuth oa && oa.Type == "Bearer" ) {
             _oAuth = oa;
-            File.WriteAllText(TokenFile, content);
+            File.WriteAllText(TokenFile(_api), content);
             httpClient.DefaultRequestHeaders.Clear();
             httpClient.DefaultRequestHeaders.Add("Authorization", $"{_oAuth.Type} {_oAuth.Access}");
             _tokDT = DateTime.Now;
@@ -535,7 +537,7 @@ namespace Positec {
           Trace.TraceError($"Recveive {ex}");
         }
         Mowers[idx].Json = FormatJson(json);
-        RecvMqtt?.Invoke(this, new RecvEventArgs() { MowIdx = idx });
+        RecvMqtt?.Invoke(this, new RecvEventArgs() { Api = _api, Name = Mowers[idx].Product.Name, Idx = idx });
       }
       return Task.CompletedTask;
     }
