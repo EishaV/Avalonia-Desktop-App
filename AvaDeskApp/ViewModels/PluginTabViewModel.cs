@@ -41,8 +41,6 @@ namespace AvaApp.ViewModels {
   }
 
   public class PluginTabViewModel : ViewModelBase {
-    private readonly PositecApi? _client;
-
     public class PluginEntry : ViewModelBase {
       public string Name { get; private set; }
       public string Desc { get; private set; }
@@ -110,45 +108,34 @@ namespace AvaApp.ViewModels {
 
     public bool CanDoIt {
       get {
-        int idx = MainWindowViewModel.Instance.MowIdx;
+        MainWindowViewModel mw = MainWindowViewModel.Instance;
 
         //return 0 <= PluginIdx && PluginIdx < PluginList.Count && _client != null && _client.Connected &&
         //       idx != -1 && _client.Mowers[idx] != null && _client.Mowers[idx] is MowerP0;
-        return SelPlugin != null && _client != null && _client.Connected &&
-               idx != -1 && _client.Mowers[idx] != null && _client.Mowers[idx] is MowerP0;
+        return SelPlugin != null && mw.Online; // && mw.SelMow              idx != -1 && _client.Mowers[idx] != null && _client.Mowers[idx] is MowerP0;
       }
     }
     public void PluginCmd() {
       if( SelPlugin != null ) {
-        int idx = MainWindowViewModel.Instance.MowIdx;
+        MowerBase? mb = MainWindowViewModel.Instance.Mower;
 
-        if( _client != null && _client.Connected && _client.Mowers[idx] != null ) {
-          if( _client.Mowers[idx] is MowerP0 mo ) {
-            if( mo.Mqtt != null ) {
-              PluginData pd = new() {
-                Index = idx,
-                Name = mo.Product.Name ?? "Unknown",
-                Config = mo.Mqtt.Cfg,
-                Data = mo.Mqtt.Dat
-              };
-              SelPlugin.Script.Doit(pd);
-            }
+        if( mb is MowerP0 mo ) {
+          if( mo.Mqtt != null ) {
+            PluginData pd = new() {
+              Name = MainWindowViewModel.Instance.Name,
+              Config = mo.Mqtt.Cfg,
+              Data = mo.Mqtt.Dat
+            };
+            SelPlugin.Script.Doit(pd);
           }
         }
       }
     }
 
-    public void ToDo(int mowidx) {
-      PluginData pd = new() {
-        Version = MainWindowViewModel.Instance.Version ?? new Version(),
-        Index = mowidx
-      };
-      if( _client != null && _client.Connected && _client.Mowers[mowidx] is MowerP0 mo ) {
-        pd.Name = mo.Product.Name ?? "Unknown";
-        pd.Config = mo.Mqtt.Cfg;
-        pd.Data = mo.Mqtt.Dat;
-        foreach( PluginEntry pe in PluginList ) if( pe.Check ) Dispatcher.UIThread.InvokeAsync(() => pe.Script.Todo(pd));
-      }
+    public void ToDo(Version v, string k, MqttP0 m) {
+      PluginData pd = new() { Version = v, Name = k, Config = m.Cfg, Data = m.Dat };
+
+      foreach( PluginEntry pe in PluginList ) if( pe.Check ) Dispatcher.UIThread.InvokeAsync(() => pe.Script.Todo(pd));
     }
 
     public PluginTabViewModel() {
@@ -175,20 +162,13 @@ namespace AvaApp.ViewModels {
       void IDisposable.Dispose() { }
     }
 
-    public PluginTabViewModel(PositecApi client) {
-      _client = client;
-      PluginList = [];
-      PluginData = [];
-      ParaDesc = string.Empty;
-    }
-
     private void LogPlugin(string log) { Trace.TraceInformation(log); }
     internal void Init(List<string>? cfg) {
       string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
       Stopwatch sw = Stopwatch.StartNew();
 
+      PluginList.Clear();
       Trace.TraceInformation($"Plugin.Init Beg => {sw.ElapsedMilliseconds}");
-      if( _client != null ) DeskApp.SendDelegate = _client.Publish;
       DeskApp.TraceDelegate = LogPlugin;
 
       Trace.TraceInformation($"Plugin.Init Hdl => {sw.ElapsedMilliseconds}");

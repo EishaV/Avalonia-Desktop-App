@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
@@ -15,8 +16,6 @@ using MQTTnet.Client;
 using MQTTnet.Diagnostics;
 
 using ApiDic = System.Collections.Generic.Dictionary<string, Positec.ApiEntry>;
-using Plugin;
-using System.Reflection.Metadata;
 
 namespace Positec {
   public delegate void ErrDelegte(string msg);
@@ -101,9 +100,10 @@ namespace Positec {
   }
 
   public class RecvEventArgs : EventArgs {
-    public string? Api { get; set; }
-    public string? Name { get; set; }
-    public int Idx { get; set; }
+    public string Api { get; set; }
+    public string Key { get; set; }
+
+    public RecvEventArgs(string api, string key) { Api = api; Key = key; }
   }
   public class PositecApi {
     private readonly HttpClient httpClient = new();
@@ -119,7 +119,6 @@ namespace Positec {
     private DateTime _tokDT;
     private readonly IMqttClient _mqtt;
     private MqttClientOptionsBuilder _mqttCOB;
-    private string _api;
     private int _reTry = 0;
 
     public static string DirData => Path.Combine(AppContext.BaseDirectory, "Data");
@@ -127,8 +126,10 @@ namespace Positec {
 
     public static string TokenFile(string api) => Path.Combine(DirData, $"Token.{api}.json");
     public string Uuid { get; set; }
+    public string Api => _api;
+    private string _api;
 
-    public List<MowerBase> Mowers = [];
+    public Dictionary<string, MowerBase> Mowers = [];
 
     public PositecApi(ErrDelegte err, string uid) {
       var fac = new MqttFactory(); //.UseWebSocket4Net();
@@ -188,8 +189,10 @@ namespace Positec {
         if( Json.Read<List<ProductItem>>(str) is List<ProductItem> pis ) {
           Mowers = [];
           foreach( var pi in pis ) {
-            if( pi.Protocol == 1 ) Mowers.Add(new MowerP1 { Product = pi });
-            else Mowers.Add(new MowerP0 { Product = pi });
+            if( pi.Name != null ) {
+              if( pi.Protocol == 1 ) Mowers.Add(pi.Name, new MowerP1 { Product = pi });
+              else Mowers.Add(pi.Name, new MowerP0 { Product = pi });
+            }
           }
         }
       } catch( Exception ex ) {
@@ -200,16 +203,16 @@ namespace Positec {
       return true;
     }
 
-    public async Task GetStatus(int idx) {
+    public async Task GetStatus(string key) {
       try {
         if( await CheckToken() ) {
-          string url = $"{UrlApi}product-items/{Mowers[idx].Product.SerialNo}?status=1";
+          string url = $"{UrlApi}product-items/{Mowers[key].Product.SerialNo}?status=1";
           HttpResponseMessage response = await httpClient.GetAsync(url);
           response.EnsureSuccessStatusCode();
           var str = await response.Content.ReadAsStringAsync();
 
           //Trace.TraceInformation($"Last status: {str}");
-          if( Mowers[idx] is MowerP0 mo ) {
+          if( Mowers[key] is MowerP0 mo ) {
             if( Json.Read<StatusOld>(str) is StatusOld pi && pi.Last != null && pi.Last.PayLoad != null ) {
               int ip = str.IndexOf("\"payload\":");
 
@@ -220,7 +223,7 @@ namespace Positec {
               //return true;
             }
           }
-          if( Mowers[idx] is MowerP1 mn ) {
+          if( Mowers[key] is MowerP1 mn ) {
             if( Json.Read<StatusNew>(str) is StatusNew pi && pi.Last != null && pi.Last.PayLoad != null ) {
               int ip = str.IndexOf("\"payload\":");
 
@@ -234,14 +237,14 @@ namespace Positec {
         }
       } catch( Exception ex ) {
         Err(ex.Message);
-        Trace.TraceError($"GetLastState({idx}) => {ex}");
+        Trace.TraceError($"GetLastState({key}) => {ex}");
       }
       //return false;
     }
 
-    public async Task ResetBlade(int idx) {
+    public async Task ResetBlade(string key) {
       try {
-        string? snr = Mowers[idx].Product.SerialNo;
+        string? snr = Mowers[key].Product.SerialNo;
 
         if( snr != null ) {
           string url = $"{UrlApi}product-items/{snr}/counters/blade/reset";
@@ -250,7 +253,7 @@ namespace Positec {
 
           //str = "{\"push_notifications\":" + "true" + "}";
           Trace.TraceInformation($"Reset Blade => {content}");
-          if( Json.Read<ProductItem>(content) is ProductItem pi ) Mowers[idx].Product = pi;
+          if( Json.Read<ProductItem>(content) is ProductItem pi ) Mowers[key].Product = pi;
         }
       } catch( Exception ex ) {
         Err(ex.Message);
@@ -399,8 +402,8 @@ namespace Positec {
       else return true;
     }
 
-    public async Task<List<ActivityEntry>> GetActivities(int idx) {
-      var mp = Mowers[idx].Product;
+    public async Task<List<ActivityEntry>> GetActivities(string key) {
+      var mp = Mowers[key].Product;
 
       if( await CheckToken() ) {
         string url = $"{UrlApi}product-items/{mp.SerialNo}/activity-log";
@@ -437,8 +440,9 @@ namespace Positec {
     }
 
     public async Task<bool> Start() {
-      string? broker = Mowers[0].Product.Endpoint;
-      int userid = Mowers[0].Product.UserId; // User.Id;
+      KeyValuePair<string, MowerBase> first = Mowers.First();
+      string? broker = first.Value.Product.Endpoint;
+      int userid = first.Value.Product.UserId; // User.Id;
 
       if( broker != null ) {
         try {
@@ -474,7 +478,7 @@ namespace Positec {
           Trace.TraceError($"Mqtt conn {ex}");
           return false;
         }
-      } else Trace.TraceWarning($"Mqtt mower {Mowers[0].Product.Name} has no endpoint!");
+      } else Trace.TraceWarning($"Mqtt mower {first.Value.Product.Name} has no endpoint!");
       return true;
     }
 
@@ -495,7 +499,7 @@ namespace Positec {
       }
       if( _mqtt.IsConnected ) _reTry = 0;
 
-      foreach( MowerBase mb in Mowers ) {
+      foreach( MowerBase mb in Mowers.Values ) {
         if( mb.Product.Topic is MqttTopic mt ) {
           await _mqtt.SubscribeAsync(mt.CmdOut, MQTTnet.Protocol.MqttQualityOfServiceLevel.AtLeastOnce);
           Trace.TraceInformation($"Mqtt subscribed to {mt.CmdOut}");
@@ -523,21 +527,21 @@ namespace Positec {
     Task Mqtt_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e) {
       string tpc = e.ApplicationMessage.Topic;
       string json = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
-      int idx = Mowers.FindIndex((m) => m.Product.Topic?.CmdOut == tpc);
+      string? key = Mowers.Keys.FirstOrDefault(k => Mowers[k].Product.Topic?.CmdOut == tpc);
 
       Trace.TraceInformation($"Receive topic: {tpc}");
       Trace.TraceInformation($"Receive json: {json}");
-      if( 0 <= idx && idx < Mowers.Count ) {
+      if( !string.IsNullOrEmpty(key) ) {
         try {
           if( e.ApplicationMessage.PayloadSegment.Array is byte[] ba ) {
-            if( Mowers[idx] is MowerP0 mo && Json.Read<MqttP0>(ba) is MqttP0 m0 ) mo.Mqtt = m0;
-            if( Mowers[idx] is MowerP1 mn && Json.Read<MqttP1>(ba) is MqttP1 m1 ) mn.Mqtt = m1;
+            if( Mowers[key] is MowerP0 mo && Json.Read<MqttP0>(ba) is MqttP0 m0 ) mo.Mqtt = m0;
+            if( Mowers[key] is MowerP1 mn && Json.Read<MqttP1>(ba) is MqttP1 m1 ) mn.Mqtt = m1;
           }
         } catch( Exception ex ) {
           Trace.TraceError($"Recveive {ex}");
         }
-        Mowers[idx].Json = FormatJson(json);
-        RecvMqtt?.Invoke(this, new RecvEventArgs() { Api = _api, Name = Mowers[idx].Product.Name, Idx = idx });
+        Mowers[key].Json = FormatJson(json);
+        RecvMqtt?.Invoke(this, new RecvEventArgs(_api, key));
       }
       return Task.CompletedTask;
     }
@@ -551,7 +555,7 @@ namespace Positec {
     public void Exit() {
       if( _mqtt != null && _mqtt.IsConnected ) {
         _mqtt.ApplicationMessageReceivedAsync -= Mqtt_ApplicationMessageReceivedAsync;
-        foreach( MowerBase mb in Mowers ) {
+        foreach( MowerBase mb in Mowers.Values ) {
           if( mb.Product.Topic is MqttTopic mt ) _mqtt.UnsubscribeAsync(mt.CmdOut);
         }
         _mqtt.DisconnectedAsync -= Mqtt_DisconnectedAsync;
@@ -560,8 +564,8 @@ namespace Positec {
     }
 
     public bool Connected { get { return _mqtt != null && _mqtt.IsConnected; } }
-    public void Publish(string s, int i) {
-      if( Mowers[i].Product.Topic is MqttTopic mt ) {
+    public void Publish(string s, string k) {
+      if( Mowers[k].Product.Topic is MqttTopic mt ) {
         string str = s.StartsWith('{') && s.EndsWith('}') ? s : '{' + s + '}';
         var msg = new MqttApplicationMessageBuilder()
                       .WithTopic(mt.CmdIn)
@@ -575,7 +579,7 @@ namespace Positec {
         } catch( Exception ex ) {
           Trace.TraceError($"Publish {ex}");
         }
-      } else Trace.TraceWarning($"Publish {Mowers[i].Product.Name} has no topic.");
+      } else Trace.TraceWarning($"Publish {Mowers[k].Product.Name} has no topic.");
     }
   }
 }

@@ -14,7 +14,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Enums;
@@ -22,14 +21,10 @@ using MsBox.Avalonia.Enums;
 using Plugin;
 using Positec;
 using AvaApp.Views;
-using Avalonia.Platform;
 using Avalonia.Styling;
-using Avalonia.Data.Converters;
-using Avalonia.Data;
-using System.Globalization;
-using CSScripting;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace AvaApp.ViewModels {
   [DataContract]
@@ -50,14 +45,14 @@ namespace AvaApp.ViewModels {
     [DataMember(Name = "uuid")] public string? Uuid;
     [DataMember(Name = "api")] public string? Api;
     [DataMember(Name = "mail")] public string? Mail;
-    [DataMember(Name = "midx")] public int? Midx;
+    [DataMember(Name = "name")] public string? Name;
     [DataMember(Name = "frame")] public CfgFrame Frame;
     [DataMember(Name = "plugins")] public List<string>? Plugins;
 
     public bool Equals(CfgJson cfg) {
       bool b;
 
-      b = Uuid == cfg.Uuid && Api == cfg.Api && Mail == cfg.Mail && Midx == cfg.Midx;
+      b = Uuid == cfg.Uuid && Api == cfg.Api && Mail == cfg.Mail && Name == cfg.Name;
       //b = b && Top == lsj.Top && X == lsj.X && Y == lsj.Y && W == lsj.W && H == lsj.H;
       if(b && Plugins != null && cfg.Plugins != null) {
         b = Plugins.Count == cfg.Plugins.Count;
@@ -76,7 +71,7 @@ namespace AvaApp.ViewModels {
 
     public bool Splash { get; private set; }
     public string Uuid { get; set; }
-    public Version? Version { get; set; }
+    public static Version Version { get; set; }
 
     internal static Window? AppMainWindow {
       get {
@@ -85,25 +80,56 @@ namespace AvaApp.ViewModels {
       }
     }
 
-    private readonly PositecApi client;
+    private readonly Dictionary<string, PositecApi> DicCli = [];
 
-    public List<string>? MowNames { get; set; }
-    public int MowIdx {
-      get => _MowIdx;
+    public ObservableCollection<string> MowNames { get; set; }
+
+    public string Name {
+      get => _Name;
       set {
-        _MowIdx = value;
+        _Name = value;
+        this.RaisePropertyChanged(nameof(Name));
         UpdateMqtt();
+        this.RaisePropertyChanged(nameof(CanTabCfg));
         Activities.Clear();
       }
     }
-    private int _MowIdx;
+    private string _Name;
+
+    public PositecApi? Client {
+      get {
+        if( !string.IsNullOrEmpty(Name) ) {
+          foreach( PositecApi pa in DicCli.Values ) {
+            if( pa != null ) {
+              if( pa.Mowers.ContainsKey(Name) ) return pa;
+            } else Debug.WriteLine("Client null client");
+          }
+        } else Debug.WriteLine("Client null name");
+        return null;
+      }
+    }
+
+    public MowerBase? Mower {
+      get {
+        if( !string.IsNullOrEmpty(Name) ) {
+          foreach( PositecApi pa in DicCli.Values ) {
+            if( pa != null ) {
+              if( pa.Connected ) {
+                if( pa.Mowers.TryGetValue(Name, out MowerBase? val) ) return val;
+              } else Debug.WriteLine("Mower not connect");
+            } else Debug.WriteLine("Mower null client");
+          }
+        } else Debug.WriteLine("Mower null name");
+        return null;
+      }
+    }
 
     public int TabIdx {
       get => _TabIdx;
       set {
         this.RaiseAndSetIfChanged(ref _TabIdx, value);
         this.RaisePropertyChanged(nameof(CanPoll));
-        if( TabIdx == 2 && client.Mowers[_MowIdx] is MowerP0 mo ) ConfigVM?.Refresh(mo.Mqtt, true);
+        if( TabIdx == 2 && Mower is MowerP0 mo ) ConfigVM?.Refresh(mo.Mqtt, true);
         if( TabIdx == 3 && Activities.Count == 0 ) Dispatcher.UIThread.InvokeAsync(() => ActCmdCall());
       }
     }
@@ -114,18 +140,20 @@ namespace AvaApp.ViewModels {
     public ConfigTabViewModel ConfigVM { get; }
     public PluginTabViewModel? PluginVM { get; }
 
-    public bool Online => client != null && client.Connected && 0 <= MowIdx && MowIdx < client.Mowers.Count && client.Mowers[MowIdx].Product.Online;
+    public bool Online => Mower != null && Mower.Product.Online;
 
     public bool CanPoll => TabIdx == 0 || TabIdx == 2 || TabIdx == 3 || TabIdx == 4;
     public async void CmdPoll() {
       if( TabIdx == 3 ) await ActCmdCall();
       else {
-        if( client != null ) {
-          if( client.Connected ) client.Publish("", MowIdx);
-          else {
-            MowerBase mb = client.Mowers[MowIdx];
+        PositecApi? pa = Client;
 
-            await client.GetStatus(MowIdx);
+        if( pa != null ) {
+          if( pa.Connected ) pa.Publish("", Name);
+          else {
+            MowerBase mb = pa.Mowers[Name];
+
+            await pa.GetStatus(Name);
             if( !string.IsNullOrEmpty(mb.Json) ) {
               MqttJson = mb.Json;
               if( mb is MowerP0 mo && mo.Mqtt != null ) StatusVM?.Refresh(mo.Mqtt);
@@ -133,7 +161,7 @@ namespace AvaApp.ViewModels {
             }
           }
         }
-      } 
+      }
     }
     public void CmdMode() {
       if( Application.Current is Application a ) {
@@ -148,35 +176,35 @@ namespace AvaApp.ViewModels {
       }
     }
 
-    public bool CanTabCfg => 0 <= MowIdx && MowIdx < client.Mowers.Count 
-                          && client.Mowers[MowIdx] is MowerP0;
+    public bool CanTabCfg => Mower is MowerP0;
 
-    public async Task ResetBlade() {
-      if( client != null && client.Connected ) await client.ResetBlade(MowIdx);
-    }
+    public async Task ResetBlade() { if( Client is PositecApi pa ) await pa.ResetBlade(Name); }
 
-    public void Publish(string json) {
-      if( client != null && client.Connected ) client.Publish(json, MowIdx);
-    }
+    public void Publish(string json) { if( Client is PositecApi pa ) pa.Publish(json, Name); }
 
     #region Constructor's
-    private static readonly MainWindowViewModel _Instance;
     public static MainWindowViewModel Instance => _Instance;
+    private static readonly MainWindowViewModel _Instance;
 
     static MainWindowViewModel() {
-      _Instance = new MainWindowViewModel(); ;
+      Assembly assembly = Assembly.GetExecutingAssembly();
+      FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+
+      Version = new(fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart);
+      _Instance = new MainWindowViewModel();
     }
 
     public MainWindowViewModel() {
       CfgJson cfg = DeskApp.GetJson<CfgJson>(GetConfigFile()) ?? new();
 
       CmdLogin = ReactiveCommand.Create(Login);
+      MowNames = [];
+      _Name = string.Empty;
       _Json = string.Empty;
       MqttIn = string.Empty;
       Activities = [];
       Uuid = cfg.Uuid ?? Guid.NewGuid().ToString();
       Splash = true;
-      client = new PositecApi(Err, Uuid);
       ConfigVM = ConfigTabViewModel.Instance;
 
       if( Design.IsDesignMode ) return;
@@ -194,7 +222,7 @@ namespace AvaApp.ViewModels {
       Trace.Listeners.Add(stl);
 
       StatusVM = new StatusViewModel();
-      PluginVM = new PluginTabViewModel(client);
+      PluginVM = new PluginTabViewModel();
 
       if(cfg.Api != null) { UsrApi = UsrApis.FirstOrDefault(x => x.StartsWith(cfg.Api)); this.RaisePropertyChanged(nameof(UsrApi)); }
       UsrMail = cfg.Mail; this.RaisePropertyChanged(nameof(UsrMail));
@@ -209,6 +237,27 @@ namespace AvaApp.ViewModels {
     public string? UsrPass { get; set; }
 
     public ReactiveCommand<Unit, Unit> CmdLogin { get; }
+
+    private async Task<bool> BegApi(string api, PositecApi pa) {
+      DicCli.Add(api, pa);
+      foreach( string key in pa.Mowers.Keys ) {
+        MowNames.Add(key);
+        await pa.GetStatus(key);
+      }
+      pa.RecvMqtt += Client_RecvMqtt;
+      return await MqttBeg(pa);
+    }
+    private void EndAPi(string api) {
+      foreach( string key in DicCli.Keys ) {
+        if( key == api ) {
+          Trace.TraceInformation($"Main.EndApi {api}");
+          DicCli[key].RecvMqtt -= Client_RecvMqtt;
+          DicCli[key].Exit();
+          DicCli.Remove(key);
+        }
+      }
+    }
+
     public async void Login() {
       lasterror = string.Empty;
       if( UsrApi != null && UsrMail != null && UsrPass != null ) {
@@ -216,18 +265,17 @@ namespace AvaApp.ViewModels {
         string api = UsrApi[..2];
         string mail = UsrMail;
         string pass = UsrPass;
+        PositecApi pa = new(Err, api);
 
         b?.Flyout?.Hide();
-        if( client.Connected ) {
-          Trace.TraceInformation($"Main.Login Exiting old connection");
-          client.Exit();
-        }
         Trace.TraceInformation($"Main.Login {api} {mail}");
-        if( await client.Login(api, mail, pass) && client.Mowers.Count > 0 ) {
-          Trace.TraceInformation($"Main.Login Start Mqtt");
-          if( await StartMqtt() ) {
-            await client.GetStatus(0);
-            MowIdx = 0;
+
+        EndAPi(api);
+        if( await pa.Login(api, mail, pass) && pa.Mowers.Count > 0 ) {
+          Trace.TraceInformation($"Main.Login Start {api} Mqtt");
+          if( await BegApi(api, pa) ) {
+            Trace.TraceInformation($"Main.Login success");
+            Name = pa.Mowers.Keys.First();
           } else await ErrorMsg("Fehler - Verbinden");
         } else await ErrorMsg("Fehler - Anmelden");
       }
@@ -254,18 +302,18 @@ namespace AvaApp.ViewModels {
 
     #region Events
     private void Client_RecvMqtt(object? sender, RecvEventArgs e) {
-      if( client != null && e.Idx == MowIdx ) {
-        MqttJson = client.Mowers[MowIdx].Json;
-        if( client.Mowers[_MowIdx] is MowerP0 mo) {
+      if( e.Key == Name && Mower is MowerBase mb ) {
+        MqttJson = mb.Json;
+        if( mb is MowerP0 mo ) {
           Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mo.Mqtt));
           Dispatcher.UIThread.InvokeAsync(() => ConfigVM?.Refresh(mo.Mqtt, false));
+          PluginVM?.ToDo(Version, e.Key, mo.Mqtt);
         }
-        if(client.Mowers[_MowIdx] is MowerP1 mn) {
+        if( mb is MowerP1 mn ) {
           Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mn.Mqtt));
           //Dispatcher.UIThread.InvokeAsync(() => ConfigVM.Refresh(mo.Mqtt, false));
         }
       }
-      PluginVM?.ToDo(e.Idx);
     }
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {
@@ -273,24 +321,21 @@ namespace AvaApp.ViewModels {
       Stopwatch sw = Stopwatch.StartNew();
 
       Trace.TraceInformation($"Main.Open Beg => {sw.ElapsedMilliseconds}");
-      client.RecvMqtt += Client_RecvMqtt;
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
       if(UsrApi != null) {
-        string api = UsrApi[..2];
+        foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
+          string api = tf.Substring(tf.Length-7, 2);
+          PositecApi pa = new(Err, Uuid);
 
-        if(File.Exists(PositecApi.TokenFile(api)) && await client.Access(api) && client.Mowers.Count > 0) {
-          Trace.TraceInformation($"Main.Open Acc => {sw.ElapsedMilliseconds}");
-          if(await StartMqtt()) {
-            int mi = 0;
-
-            if(Config.Midx != null && 0 <= Config.Midx && Config.Midx < client.Mowers.Count) mi = (int)Config.Midx;
-            await client.GetStatus(mi);
-            MowIdx = mi;
-            Trace.TraceInformation($"Main.Open Con => {sw.ElapsedMilliseconds}");
-          }
+          if( await pa.Access(api) && pa.Mowers.Count > 0 ) {
+            if( await BegApi(api, pa) ) Trace.TraceInformation($"Main.Open Api {api} => {sw.ElapsedMilliseconds}");
+            else await ErrorMsg("Fehler - Verbinden");
+          } else await ErrorMsg("Fehler - Anmelden");
         }
+        this.RaisePropertyChanged(nameof(MowNames));
+        if( !string.IsNullOrEmpty(Config.Name) && MowNames.Contains(Config.Name) ) Name = Config.Name;
       } else {
         Button? b = AppMainWindow?.FindControl<Button>("BtnAcc");
 
@@ -310,49 +355,40 @@ namespace AvaApp.ViewModels {
       cfg.Uuid = Uuid;
       if( !string.IsNullOrEmpty(UsrApi) ) cfg.Api = UsrApi[..2];
       cfg.Mail = UsrMail;
-      cfg.Midx = MowIdx;
+      cfg.Name = Name;
       PluginVM?.Fini(out cfg.Plugins);
       DeskApp.PutJson(GetConfigFile(), cfg);
     }
 
     public void MainWindow_Closed(object? sender, System.EventArgs e) {
-      client.RecvMqtt -= Client_RecvMqtt;
+      foreach( var pa in DicCli.Values ) pa.RecvMqtt -= Client_RecvMqtt;
     }
     #endregion
 
     #region Functions
-    private async Task<bool> StartMqtt() {
-      bool b = await client.Start();
+    private async Task<bool> MqttBeg(PositecApi pa) {
+      bool b = await pa.Start();
 
-      if( b ) {
-        MowNames = [];
-        foreach( MowerBase mb in client.Mowers ) {
-          if( mb.Product.Name != null ) MowNames.Add(mb.Product.Name);
-        }
-        this.RaisePropertyChanged(nameof(MowNames));
-        if( StatusVM != null ) StatusVM.CanPoll = client.Connected;
-      }
+      if( b && StatusVM != null ) StatusVM.CanPoll = pa.Connected;
       return b;
     }
 
     private void UpdateMqtt() {
-      if( UsrApi != null && 0 <= _MowIdx && _MowIdx < client.Mowers.Count ) {
-        StatusVM?.UpdateProduct(UsrApi[..2], client.Mowers[MowIdx].Product);
-        if( client.Mowers[_MowIdx] is MowerP0 mo ) {
-          if( mo.Mqtt != null && !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+      if( Client is PositecApi pa && Mower is MowerBase mb ) {
+        StatusVM?.UpdateProduct(pa.Api, mb.Product);
+        if( mb is MowerP0 mo ) {
+          if( mo.Mqtt != null && !string.IsNullOrEmpty(mb.Json) ) {
             StatusVM?.Refresh(mo.Mqtt);
             ConfigVM?.Refresh(mo.Mqtt, true);
           }
         }
-        if( client.Mowers[_MowIdx] is MowerP1 mn ) {
-          if( mn.Mqtt != null || !string.IsNullOrEmpty(client.Mowers[MowIdx].Json) ) {
+        if( mb is MowerP1 mn ) {
+          if( mn.Mqtt != null || !string.IsNullOrEmpty(mb.Json) ) {
             StatusVM?.Refresh(mn.Mqtt);
             //ConfigVM.Refresh(mo.Mqtt, true);
           }
         }
-        this.RaisePropertyChanged(nameof(MowIdx));
-        this.RaisePropertyChanged(nameof(CanTabCfg));
-        MqttJson = client.Mowers[MowIdx].Json;
+        MqttJson = mb.Json;
         //this.RaisePropertyChanged(nameof(Activities));
       }
     }
@@ -371,13 +407,13 @@ namespace AvaApp.ViewModels {
       "\"tq\":0 - Torque normal => zero" ];
     public string MqttIn { get; set; }
 
-    public bool CanSend => client.Connected;
+    public bool CanSend => Online;
     public void MqttCmd() {
       if( !string.IsNullOrEmpty(MqttIn) ) {
         int p = MqttIn.IndexOf(" - ");
         string s = p > 0 ? MqttIn[..p] : MqttIn;
 
-        client.Publish(s, _MowIdx);
+        Publish(s);
       }
     }
     #endregion
@@ -397,7 +433,7 @@ namespace AvaApp.ViewModels {
       //public string Error { get; private set; }
       public string Charge { get; private set; }
 
-      private ActColors _ac = ActColors.None;  
+      private readonly ActColors _ac = ActColors.None;  
       public IBrush? Color {
         get {
           //bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
@@ -435,23 +471,21 @@ namespace AvaApp.ViewModels {
 
     public async Task ActCmdCall() {
       Activities.Clear();
-      if( client != null && await client.CheckToken() && 0 <= MowIdx && MowIdx <= client.Mowers.Count ) {
-        foreach( ActivityEntry ae in await client.GetActivities(MowIdx) ) Activities.Add(new ActEntryVM(ae));
+      if( Client is PositecApi pa && await pa.CheckToken() ) {
+        foreach( ActivityEntry ae in await pa.GetActivities(Name) ) Activities.Add(new ActEntryVM(ae));
       }
       this.RaisePropertyChanged(nameof(Activities));
     }
 
     public async void ActCmdJson() {
-      if( client != null && 0 <= MowIdx && MowIdx <= client.Mowers.Count ) {
-        string name = $"ActLog_{client.Mowers[MowIdx].Product.Name}.json";
-        string path = Path.Combine(PositecApi.DirTrace, name);
+      string name = $"ActLog_{Name}.json";
+      string path = Path.Combine(PositecApi.DirTrace, name);
 
-        if( !File.Exists(path) ) await ActCmdCall();
-        using Process editor = new();
-        editor.StartInfo.FileName = path;
-        editor.StartInfo.UseShellExecute = true;
-        editor.Start();
-      }
+      if( !File.Exists(path) ) await ActCmdCall();
+      using Process editor = new();
+      editor.StartInfo.FileName = path;
+      editor.StartInfo.UseShellExecute = true;
+      editor.Start();
     }
     #endregion
 

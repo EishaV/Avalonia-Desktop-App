@@ -79,7 +79,7 @@
       </Button>
       <TextBlock Grid.Column="2" Text="{tx:Localize main_mower}" VerticalAlignment="Center" FontWeight="DemiBold" FontSize="20"/>
       <ComboBox Grid.Column="3" MinWidth="200" VerticalAlignment="Center" Margin="5 0"
-                ItemsSource="{Binding MowNames}" SelectedIndex="{Binding MowIdx}" />
+                ItemsSource="{Binding MowNames}" SelectedItem="{Binding Name}" />
       <Button Grid.Column="4" Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}">
         <PathIcon Data="{StaticResource poll}"/>
       </Button>

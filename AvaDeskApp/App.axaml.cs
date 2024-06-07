@@ -35,7 +35,7 @@ namespace AvaApp {
 
       Console.WriteLine($"BaseDir {dir}");
       Console.WriteLine($"Assembly {assembly.Location} {assembly.FullName}");
-      title = assembly.GetName().Name ?? "PosiMowApp";
+      title = assembly.GetName().Name ?? "AvaDeskApp";
 
       int pid = Environment.ProcessId; Console.WriteLine($"ProcessId {pid}");
       Process[] ps = Process.GetProcesses(); Console.WriteLine($"Processes {ps.Length}");
@@ -65,18 +65,16 @@ namespace AvaApp {
       if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
         MainWindowViewModel mwvm = MainWindowViewModel.Instance;
         CfgFrame fr = mwvm.Config.Frame;
-        FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
         //? if( fr.X < 0 || fr.Y < 0 ) fr = new CfgFrame();
         desktop.MainWindow = new MainWindow {
-          DataContext = mwvm, Title = $"{title} {fvi.ProductVersion}",
+          DataContext = mwvm, Title = $"{title} {MainWindowViewModel.Version}",
           WindowStartupLocation = WindowStartupLocation.Manual,
           Position = new PixelPoint(fr.X-10, fr.Y), Width = fr.W, Height = fr.H
         };
         Trace.TraceInformation($"{desktop.MainWindow.Title}");
 
         if( mwvm != null ) {
-          mwvm.Version = new Version(fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart);
           desktop.MainWindow.Opened += mwvm.MainWindow_Opened;
           desktop.MainWindow.Closed += mwvm.MainWindow_Closed;
           desktop.MainWindow.Closing += mwvm.MainWindow_Closing;
