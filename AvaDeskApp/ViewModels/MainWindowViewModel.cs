@@ -239,22 +239,21 @@ namespace AvaApp.ViewModels {
     public ReactiveCommand<Unit, Unit> CmdLogin { get; }
 
     private async Task<bool> BegApi(string api, PositecApi pa) {
+      Trace.TraceInformation($"Main.BegApi {api}");
       DicCli.Add(api, pa);
       foreach( string key in pa.Mowers.Keys ) {
         MowNames.Add(key);
         await pa.GetStatus(key);
       }
       pa.RecvMqtt += Client_RecvMqtt;
-      return await MqttBeg(pa);
+      return await pa.Start();
     }
     private void EndAPi(string api) {
-      foreach( string key in DicCli.Keys ) {
-        if( key == api ) {
-          Trace.TraceInformation($"Main.EndApi {api}");
-          DicCli[key].RecvMqtt -= Client_RecvMqtt;
-          DicCli[key].Exit();
-          DicCli.Remove(key);
-        }
+      if( DicCli.TryGetValue(api, out PositecApi? pa) && pa != null ) {
+        Trace.TraceInformation($"Main.EndApi {api}");
+        pa.RecvMqtt -= Client_RecvMqtt;
+        pa.Exit();
+        DicCli.Remove(api);
       }
     }
 
@@ -276,6 +275,7 @@ namespace AvaApp.ViewModels {
           if( await BegApi(api, pa) ) {
             Trace.TraceInformation($"Main.Login success");
             Name = pa.Mowers.Keys.First();
+            if( StatusVM != null ) StatusVM.CanPoll = pa.Connected;
           } else await ErrorMsg("Fehler - Verbinden");
         } else await ErrorMsg("Fehler - Anmelden");
       }
@@ -307,33 +307,36 @@ namespace AvaApp.ViewModels {
         if( mb is MowerP0 mo ) {
           Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mo.Mqtt));
           Dispatcher.UIThread.InvokeAsync(() => ConfigVM?.Refresh(mo.Mqtt, false));
-          PluginVM?.ToDo(Version, e.Key, mo.Mqtt);
         }
         if( mb is MowerP1 mn ) {
           Dispatcher.UIThread.InvokeAsync(() => StatusVM?.Refresh(mn.Mqtt));
           //Dispatcher.UIThread.InvokeAsync(() => ConfigVM.Refresh(mo.Mqtt, false));
         }
       }
+      if( DicCli[e.Api] is PositecApi pa && pa?.Mowers[e.Key] is MowerP0 mp ) PluginVM?.ToDo(Version, e.Key, mp.Mqtt);
     }
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {
       string dir = AppDomain.CurrentDomain.BaseDirectory;
       Stopwatch sw = Stopwatch.StartNew();
+      bool acc = false;
 
       Trace.TraceInformation($"Main.Open Beg => {sw.ElapsedMilliseconds}");
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
-      if(UsrApi != null) {
-        foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
-          string api = tf.Substring(tf.Length-7, 2);
-          PositecApi pa = new(Err, Uuid);
+      foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
+        string api = tf.Substring(tf.Length-7, 2);
+        PositecApi pa = new(Err, Uuid);
 
-          if( await pa.Access(api) && pa.Mowers.Count > 0 ) {
-            if( await BegApi(api, pa) ) Trace.TraceInformation($"Main.Open Api {api} => {sw.ElapsedMilliseconds}");
-            else await ErrorMsg("Fehler - Verbinden");
-          } else await ErrorMsg("Fehler - Anmelden");
-        }
+        if( await pa.Access(api) && pa.Mowers.Count > 0 ) {
+          if( acc = await BegApi(api, pa) ) {
+            Trace.TraceInformation($"Main.Open Api {api} => {sw.ElapsedMilliseconds}");
+            if( StatusVM != null ) StatusVM.CanPoll = pa.Connected;
+          } else await ErrorMsg("Fehler - Verbinden");
+        } else await ErrorMsg("Fehler - Anmelden");
+      }
+      if( acc ) {
         this.RaisePropertyChanged(nameof(MowNames));
         if( !string.IsNullOrEmpty(Config.Name) && MowNames.Contains(Config.Name) ) Name = Config.Name;
       } else {
@@ -361,17 +364,11 @@ namespace AvaApp.ViewModels {
     }
 
     public void MainWindow_Closed(object? sender, System.EventArgs e) {
-      foreach( var pa in DicCli.Values ) pa.RecvMqtt -= Client_RecvMqtt;
+      while( DicCli.Count > 0 ) EndAPi(DicCli.Keys.First());
     }
     #endregion
 
     #region Functions
-    private async Task<bool> MqttBeg(PositecApi pa) {
-      bool b = await pa.Start();
-
-      if( b && StatusVM != null ) StatusVM.CanPoll = pa.Connected;
-      return b;
-    }
 
     private void UpdateMqtt() {
       if( Client is PositecApi pa && Mower is MowerBase mb ) {
