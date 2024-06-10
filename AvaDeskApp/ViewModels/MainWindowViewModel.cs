@@ -109,8 +109,13 @@ namespace AvaApp.ViewModels {
       }
     }
 
+    FileSystemWatcher? _fsw = null;
+    MowerBase? _mb = null;
+
     public MowerBase? Mower {
       get {
+        if( _mb != null ) return _mb;
+
         if( !string.IsNullOrEmpty(Name) ) {
           foreach( PositecApi pa in DicCli.Values ) {
             if( pa != null ) {
@@ -172,10 +177,13 @@ namespace AvaApp.ViewModels {
     }
 
     public bool CanTabCfg => Mower is MowerP0;
+    public bool CanTabAct => _mb == null;
 
     public async Task ResetBlade() { if( Client is PositecApi pa ) await pa.ResetBlade(Name); }
 
-    public void Publish(string json) { if( Client is PositecApi pa ) pa.Publish(json, Name); }
+    public void Publish(string json) {
+      if( Client is PositecApi pa ) pa.Publish(json, Name);
+    }
 
     #region Constructor's
     public static MainWindowViewModel Instance => _Instance;
@@ -219,14 +227,17 @@ namespace AvaApp.ViewModels {
       StatusVM = new StatusViewModel();
       PluginVM = new PluginTabViewModel();
 
-      if(cfg.Api != null) { UsrApi = UsrApis.FirstOrDefault(x => x.StartsWith(cfg.Api)); this.RaisePropertyChanged(nameof(UsrApi)); }
+      if( cfg.Api != null ) {
+        UsrApi = UsrApis.FirstOrDefault(x => x.StartsWith(cfg.Api));
+        this.RaisePropertyChanged(nameof(UsrApi));
+      }
       UsrMail = cfg.Mail; this.RaisePropertyChanged(nameof(UsrMail));
       _Config = cfg;
     }
     #endregion
 
     #region Account
-    public static List<string> UsrApis => [ "WX - Worx Landroid", "KR - Kress Mission", "LX - LandXcape", "SM - Ferrex Smartmower" ];
+    public static List<string> UsrApis => [ "WX - Worx Landroid", "KR - Kress Mission", "LX - LandXcape", "SM - Ferrex Smartmower", "SI - Simulation" ];
     public string? UsrApi { get; set; }
     public string? UsrMail { get; set; }
     public string? UsrPass { get; set; }
@@ -312,7 +323,6 @@ namespace AvaApp.ViewModels {
     }
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {
-      string dir = AppDomain.CurrentDomain.BaseDirectory;
       Stopwatch sw = Stopwatch.StartNew();
       bool acc = false;
 
@@ -320,31 +330,69 @@ namespace AvaApp.ViewModels {
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
-      foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
-        string api = tf.Substring(tf.Length-7, 2);
-        PositecApi pa = new(Err, Uuid);
+      if( _Config.Api != "SI" ) {
+        foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
+          string api = tf.Substring(tf.Length - 7, 2);
+          PositecApi pa = new(Err, Uuid);
 
-        if( await pa.Access(api) && pa.Mowers.Count > 0 ) {
-          if( acc = await BegApi(api, pa) ) {
-            Trace.TraceInformation($"Main.Open Api {api} => {sw.ElapsedMilliseconds}");
-            if( StatusVM != null ) StatusVM.CanPoll = pa.Connected;
-          } else await ErrorMsg("Fehler - Verbinden");
-        } else await ErrorMsg("Fehler - Anmelden");
-      }
-      if( acc ) {
-        this.RaisePropertyChanged(nameof(MowNames));
-        if( !string.IsNullOrEmpty(Config.Name) && MowNames.Contains(Config.Name) ) Name = Config.Name;
+          if( await pa.Access(api) && pa.Mowers.Count > 0 ) {
+            if( acc = await BegApi(api, pa) ) {
+              Trace.TraceInformation($"Main.Open Api {api} => {sw.ElapsedMilliseconds}");
+              if( StatusVM != null ) StatusVM.CanPoll = pa.Connected;
+            } else await ErrorMsg("Fehler - Verbinden");
+          } else await ErrorMsg("Fehler - Anmelden");
+        }
+        if( acc ) {
+          this.RaisePropertyChanged(nameof(MowNames));
+          if( !string.IsNullOrEmpty(Config.Name) && MowNames.Contains(Config.Name) ) Name = Config.Name;
+        } else {
+          Button? b = AppMainWindow?.FindControl<Button>("BtnAcc");
+
+          b?.Flyout?.ShowAt(b);
+        }
       } else {
-        Button? b = AppMainWindow?.FindControl<Button>("BtnAcc");
+        string dir = PositecApi.DirData, name = "CmdOut.json";
+        ProductItem? pi = DeskApp.GetJson<ProductItem>(Path.Combine(dir, "ProductItem.json"));
 
-        b?.Flyout?.ShowAt(b);
+        if( pi != null ) {
+          Trace.TraceInformation($"Main.Open Api SI => {sw.ElapsedMilliseconds}");
+          if( pi.Protocol == 0 ) _mb = new MowerP0() { Product = pi };
+          this.RaisePropertyChanged(nameof(CanTabAct));
+          CheckCmdOut(Path.Combine(dir, name));
+          UpdateMqtt();
+          MowNames.Add("Simulation");
+          this.RaisePropertyChanged(nameof(MowNames));
+          Name = "Simulation";
+          _fsw = new(dir, name);
+          _fsw.NotifyFilter = NotifyFilters.LastWrite;
+          _fsw.Changed += Watcher_Changed;
+          _fsw.Created += _fsw_Created;
+          _fsw.EnableRaisingEvents = true;
+        }
       }
       Splash = false; this.RaisePropertyChanged(nameof (Splash));
 
       Trace.TraceInformation($"Main.Open End => {sw.ElapsedMilliseconds}");
     }
 
-    public void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e) {
+    private void CheckCmdOut(string path) {
+      string js = File.ReadAllText(path);
+
+      if( _mb is MowerBase mb ) mb.Json = PositecApi.FormatJson(js);
+      if( _mb is MowerP0 mo && DeskApp.GetJson<MqttP0>(path) is MqttP0 m0 ) mo.Mqtt = m0;
+    }
+    
+    private void _fsw_Created(object sender, FileSystemEventArgs e) {
+      throw new NotImplementedException();
+    }
+
+    private void Watcher_Changed(object sender, FileSystemEventArgs e) {
+      Trace.TraceInformation($"WatcherChanged {e.Name}");
+      CheckCmdOut(e.FullPath);
+      Dispatcher.UIThread.InvokeAsync(UpdateMqtt);
+    }
+
+    public void MainWindow_Closing(object? sender, CancelEventArgs e) {
       CfgJson cfg = new();
 
       if( sender is MainWindow mw && mw.WindowState == WindowState.Normal ) {
@@ -358,7 +406,7 @@ namespace AvaApp.ViewModels {
       DeskApp.PutJson(GetConfigFile(), cfg);
     }
 
-    public void MainWindow_Closed(object? sender, System.EventArgs e) {
+    public void MainWindow_Closed(object? sender, EventArgs e) {
       while( DicCli.Count > 0 ) EndAPi(DicCli.Keys.First());
     }
     #endregion
@@ -366,8 +414,8 @@ namespace AvaApp.ViewModels {
     #region Functions
 
     private void UpdateMqtt() {
-      if( Client is PositecApi pa && Mower is MowerBase mb ) {
-        StatusVM?.UpdateProduct(pa.Api, mb.Product);
+      if( Mower is MowerBase mb ) {
+        if( Client is PositecApi pa ) StatusVM?.UpdateProduct(pa.Api, mb.Product);
         if( mb is MowerP0 mo ) {
           if( mo.Mqtt != null && !string.IsNullOrEmpty(mb.Json) ) {
             StatusVM?.Refresh(mo.Mqtt);
