@@ -18,22 +18,12 @@
   </Design.DataContext>
 
   <Window.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key='Back'>LightGray</SolidColorBrush>
-        </ResourceDictionary>
-        <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key='Back'>DarkGray</SolidColorBrush>
-        </ResourceDictionary>
-      </ResourceDictionary.ThemeDictionaries>
-    </ResourceDictionary>
     <StreamGeometry x:Key="user">M35.7502,28 C38.0276853,28 39.8876578,29.7909151 39.9950978,32.0427546 L40,32.2487 L40,33 C40,36.7555 38.0583,39.5669 35.0798,41.3802 C32.1509,43.1633 28.2139,44 24,44 C19.7861,44 15.8491,43.1633 12.9202,41.3802 C10.0319285,39.6218485 8.11862909,36.9249713 8.00532378,33.3388068 L8,33 L8,32.2489 C8,29.9703471 9.79294995,28.1122272 12.0440313,28.0048972 L12.2499,28 L35.7502,28 Z M35.7502,30.5 L12.2499,30.5 C11.331345,30.5 10.5787597,31.2066575 10.5057976,32.1054618 L10.5,32.2489 L10.5,33 C10.5,35.7444 11.8602,37.8081 14.2202,39.2448 C16.6297,40.7117 20.0677,41.5 24,41.5 C27.9323,41.5 31.3703,40.7117 33.7798,39.2448 C36.0555143,37.8594107 37.4015676,35.8910074 37.4948116,33.2914406 L37.5,33 L37.5,32.2488 C37.5,31.331195 36.7934328,30.5787475 35.8937801,30.5057968 L35.7502,30.5 Z M24,4 C29.5228,4 34,8.47715 34,14 C34,19.5228 29.5228,24 24,24 C18.4772,24 14,19.5228 14,14 C14,8.47715 18.4772,4 24,4 Z M24,6.5 C19.8579,6.5 16.5,9.85786 16.5,14 C16.5,18.1421 19.8579,21.5 24,21.5 C28.1421,21.5 31.5,18.1421 31.5,14 C31.5,9.85786 28.1421,6.5 24,6.5 Z</StreamGeometry>
     <StreamGeometry x:Key="poll">M12,2 C17.5228,2 22,6.47715 22,12 C22,17.5228 17.5228,22 12,22 C6.47715,22 2,17.5228 2,12 C2,6.47715 6.47715,2 12,2 Z M12,3.5 C7.30558,3.5 3.5,7.30558 3.5,12 C3.5,16.6944 7.30558,20.5 12,20.5 C16.6944,20.5 20.5,16.6944 20.5,12 C20.5,7.30558 16.6944,3.5 12,3.5 Z M16.75,12 C17.1296833,12 17.4434889,12.2821653 17.4931531,12.6482323 L17.5,12.75 L17.5,15.75 C17.5,16.1642 17.1642,16.5 16.75,16.5 C16.3703167,16.5 16.0565111,16.2178347 16.0068469,15.8517677 L16,15.75 L16,15 C15.0881,16.2143 13.6362,17 11.9999,17 C10.4748,17 9.09587,16.316 8.17857,15.237 C7.91028,14.9214 7.94862,14.4481 8.2642,14.1798 C8.57979,13.9115 9.05311,13.9499 9.3214,14.2655 C9.96322,15.0204 10.9293,15.5 11.9999,15.5 C13.32553,15.5 14.4803167,14.7625672 15.0742404,13.6746351 L15.1633,13.5 L14,13.5 C13.5858,13.5 13.25,13.1642 13.25,12.75 C13.25,12.3703167 13.5321653,12.0565111 13.8982323,12.0068469 L14,12 L16.75,12 Z M11.9999,7 C13.5368,7 14.9041,7.66036 15.8268,8.77062 C16.0915,9.08918 16.0479,9.56205 15.7294,9.8268 C15.4108,10.0916 14.9379,10.0479 14.6732,9.72938 C14.0368,8.96361 13.093,8.5 11.9999,8.5 C10.5754318,8.5 9.34895806,9.35140335 8.80281957,10.5730172 L8.72948,10.75 L10,10.75 C10.4142,10.75 10.75,11.0858 10.75,11.5 C10.75,11.8796833 10.4678347,12.1934889 10.1017677,12.2431531 L10,12.25 L7.25,12.25 C6.8703075,12.25 6.55650958,11.9678347 6.50684668,11.6017677 L6.5,11.5 L6.5,8.25 C6.5,7.83579 6.83579,7.5 7.25,7.5 C7.6296925,7.5 7.94349042,7.78215688 7.99315332,8.14823019 L8,8.25 L8,8.99955 C8.9121,7.78531 10.364,7 11.9999,7 Z</StreamGeometry>
     <StreamGeometry x:Key="dark">M12,22 C17.5228475,22 22,17.5228475 22,12 C22,6.4771525 17.5228475,2 12,2 C6.4771525,2 2,6.4771525 2,12 C2,17.5228475 6.4771525,22 12,22 Z M12,20.5 L12,3.5 C16.6944204,3.5 20.5,7.30557963 20.5,12 C20.5,16.6944204 16.6944204,20.5 12,20.5 Z</StreamGeometry>    <StreamGeometry x:Key="home_regular">M21.6062 5.85517C23.0048 4.71494 24.9952 4.71494 26.3938 5.85517L39.5688 16.5966C40.4736 17.3342 41 18.4492 41 19.628V39.1134C41 41.2599 39.2875 43 37.175 43H32.075C29.9625 43 28.25 41.2599 28.25 39.1134V29.7492C28.25 29.0337 27.6792 28.4536 26.975 28.4536H21.025C20.3208 28.4536 19.75 29.0337 19.75 29.7492V39.1134C19.75 41.2599 18.0375 43 15.925 43H10.825C8.71251 43 7 41.2599 7 39.1134V19.628C7 18.4493 7.52645 17.3342 8.43124 16.5966L21.6062 5.85517ZM24.7979 7.87612C24.3317 7.49604 23.6683 7.49604 23.2021 7.87612L10.0271 18.6175C9.72548 18.8634 9.55 19.2351 9.55 19.628V39.1134C9.55 39.8289 10.1208 40.4089 10.825 40.4089H15.925C16.6292 40.4089 17.2 39.8289 17.2 39.1134V29.7492C17.2 27.6027 18.9125 25.8626 21.025 25.8626H26.975C29.0875 25.8626 30.8 27.6027 30.8 29.7492V39.1134C30.8 39.8289 31.3708 40.4089 32.075 40.4089H37.175C37.8792 40.4089 38.45 39.8289 38.45 39.1134V19.628C38.45 19.2351 38.2745 18.8634 37.9729 18.6175L24.7979 7.87612Z</StreamGeometry>
   </Window.Resources>
 
-  <Grid RowDefinitions="Auto,*" Margin="10 5 10 5">
+  <Grid RowDefinitions="Auto,*" Margin="5 5 5 5">
     <Grid.Styles>
       <Style Selector="Button">
         <Setter Property="CornerRadius" Value="8"/>
@@ -112,23 +102,64 @@
       </TabItem>
 
       <TabItem Header="Mqtt">
-        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,Auto">
-          <TextBox Grid.ColumnSpan="3" IsReadOnly="True"
+        <Grid ColumnDefinitions="Auto,5,*,5,Auto" RowDefinitions="*,5,Auto">
+          <TextBox Grid.ColumnSpan="5" IsReadOnly="True"
                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
                    ScrollViewer.VerticalScrollBarVisibility="Visible"
                    Text="{Binding MqttJson}" />
-          <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
+          <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"
                      Text="CmdIn-String" />
-          <AutoCompleteBox Grid.Column="1" Grid.Row="1" Watermark="press quote for examples"
-                           Margin="5 5 5 0" 
+          <AutoCompleteBox Grid.Column="2" Grid.Row="2" Watermark="Press quote for examples"
                            ItemsSource="{Binding MqttIns}" Text="{Binding MqttIn}"/>
-          <Button Grid.Column="2" Grid.Row="1"
+          <Button Grid.Column="4" Grid.Row="2"
                   IsEnabled="{Binding CanSend}" Command="{Binding MqttCmd}">Send</Button>
         </Grid>
       </TabItem>
 
       <TabItem Header="{tx:Localize act}">
-        <Grid ColumnDefinitions="*" RowDefinitions="*,Auto">
+        <Grid ColumnDefinitions="*" RowDefinitions="Auto,*,5,Auto">
+          <Grid.Styles>
+            <Style Selector="TextBlock">
+              <Setter Property="Margin" Value="0"/>
+              <Setter Property="Padding" Value="5 1 5 1"/>
+            </Style>
+            <Style Selector="TextBlock.h1">
+              <Setter Property="Foreground" Value="Black" />
+              <Setter Property="FontWeight" Value="Bold"/>
+              <Setter Property="TextAlignment" Value="Center"/>
+              <Setter Property="Padding" Value="0 3 0 3"/>
+            </Style>
+          </Grid.Styles>
+          <Grid Grid.Row="0" ColumnDefinitions="150,*,35" RowDefinitions="Auto"
+                Background="Silver">
+            <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize act_stamp}"/>
+            <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize act_state}"/>
+            <TextBlock Grid.Column="2" Classes="h1" Text="C" Margin="0 0 15 0"/>
+          </Grid>
+          <!-- Background="{DynamicResource Back}"-->
+          <ScrollViewer Grid.Row="1" AllowAutoHide="False" Background="{DynamicResource Back}">
+            <ItemsControl ItemsSource="{Binding Activities}" Padding="0 0 15 0">
+              <ItemsControl.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="Background" Value="{Binding Color}" />
+                  <!--<Setter Property="Opacity" Value="0.3" />-->
+                </Style>
+              </ItemsControl.Styles>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid ColumnDefinitions="150,*,20" RowDefinitions="Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding Stamp}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding State}"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Charge}"/>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <Button Grid.Row="3" Command="{Binding ActCmdJson}" HorizontalAlignment="Right">Json...</Button>
+        </Grid>
+
+<!--
           <DataGrid ItemsSource="{Binding Activities}" AutoGenerateColumns="False" RowHeight="20" >
             <DataGrid.Styles>
               <Style Selector="DataGridRow">
@@ -145,12 +176,7 @@
               <DataGridTextColumn Header="C" Binding="{Binding Charge}" />
             </DataGrid.Columns>
           </DataGrid>
-          <DockPanel Grid.Row="1">
-            <Button DockPanel.Dock="Right" IsVisible="False"
-                    Command="{Binding ActCmdCall}" Content="{tx:Localize act_poll}" />
-            <Button DockPanel.Dock="Right" Command="{Binding ActCmdJson}">Json...</Button>
-          </DockPanel>
-        </Grid>
+-->
       </TabItem>
 
       <TabItem Header="Plugin">

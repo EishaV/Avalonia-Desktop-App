@@ -10,18 +10,6 @@
     <vm:ConfigTabViewModel/>
   </Design.DataContext>
 
-  <UserControl.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key='Back'>LightGray</SolidColorBrush>
-        </ResourceDictionary>
-        <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key='Back'>DimGray</SolidColorBrush>
-        </ResourceDictionary>
-      </ResourceDictionary.ThemeDictionaries>
-    </ResourceDictionary>
-  </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="TextBlock">
       <Setter Property="VerticalAlignment" Value="Center"/>

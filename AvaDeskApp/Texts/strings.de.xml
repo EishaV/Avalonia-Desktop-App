@@ -83,8 +83,8 @@
 
   <string name="state">Status</string>
   <string name="state_daywork">Arbeitszeit</string>
-  <string name="state_accu">Akkumulator</string>
-  <string name="state_pry">Gierwinkel</string>
+  <string name="state_accu">Batterie</string>
+  <string name="state_pry">Orient</string>
   <string name="state_blade">Mähzeit</string>
   <string name="state_blade_cmd">Setze 0</string>
   <string name="state_stat">Statistik</string>

@@ -168,11 +168,6 @@ namespace AvaApp.ViewModels {
         if( a.ActualThemeVariant == ThemeVariant.Dark ) a.RequestedThemeVariant = ThemeVariant.Light;
         else a.RequestedThemeVariant = ThemeVariant.Dark;
         UpdateMqtt();
-        //if( TabIdx == 3 ) {
-        //  TabIdx = 0;
-        //  TabIdx = 3;
-        //  //Activities.ForEach(a => this.RaisePropertyChanged(nameof(a.Color)));
-        //}
       }
     }
 
@@ -433,14 +428,12 @@ namespace AvaApp.ViewModels {
       private readonly ActColors _ac = ActColors.None;  
       public IBrush? Color {
         get {
-          //bool b = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
-
           return _ac switch {
-            ActColors.Gras => Brushes.Green,
-            ActColors.Idle => Brushes.Magenta,
-            ActColors.Rain => Brushes.Blue,
-            ActColors.Error => Brushes.Red,
-            _ => Brushes.Gray //b ? Brushes.White : Brushes.Black,
+            ActColors.Gras => new SolidColorBrush() { Opacity = 0.2, Color = Colors.Green },
+            ActColors.Idle => new SolidColorBrush() { Opacity = 0.2, Color = Colors.Magenta },
+            ActColors.Rain => new SolidColorBrush() { Opacity = 0.2, Color = Colors.Blue },
+            ActColors.Error => new SolidColorBrush() { Opacity = 0.2, Color = Colors.Red },
+            _ => Brushes.Transparent
           }; 
         }
       }
