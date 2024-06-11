@@ -116,7 +116,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem Header="{tx:Localize act}">
+      <TabItem Header="{tx:Localize act}" IsVisible="{Binding CanTabAct}">
         <Grid ColumnDefinitions="*" RowDefinitions="Auto,*,5,Auto">
           <Grid.Styles>
             <Style Selector="TextBlock">
