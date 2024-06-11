@@ -31,8 +31,21 @@
       <Image Grid.Column="1" Grid.Row="0" Source="{Binding RsiPic}" />
       <Image Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Source="{Binding WebPic}" Margin="-10" />
       <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding LastZone}'}" />
-      <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
+      <StackPanel Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"
                   Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+        <StackPanel.Resources>
+          <OnPlatform x:Key="Stamp">
+            <OnPlatform.Default><FontFamily>Helvetica</FontFamily></OnPlatform.Default>
+            <OnPlatform.Windows><FontFamily>Segoe UI</FontFamily></OnPlatform.Windows>
+            <OnPlatform.Android><FontFamily>Roboto</FontFamily></OnPlatform.Android>
+          </OnPlatform>
+        </StackPanel.Resources>
+        <StackPanel.Styles>
+          <Style Selector="TextBlock" >
+            <Setter Property="FontFamily" Value="{StaticResource Stamp}"/>
+            <Setter Property="FontStyle" Value="Italic"/>
+          </Style>
+        </StackPanel.Styles>
         <TextBlock Text="{tx:Localize state_stamp}"/>
         <TextBlock Text="{Binding Stamp}"/>
       </StackPanel>
