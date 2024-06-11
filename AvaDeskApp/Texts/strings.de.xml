@@ -106,7 +106,7 @@
   <string name="cfg_sc_end">Ende</string>
   <string name="cfg_sc_perc">Korrektur</string>
   <string name="cfg_mz">Multizonen/Startpunkte</string>
-  <string name="cfg_mz_sp">SP [m]</string>
+  <string name="cfg_mz_sp">SP</string>
   <string name="cfg_mz_perc">Anteil</string>
   <string name="cfg_more">Weitere Einstellungen</string>
   <string name="cfg_rain">Regenverzögerung</string>

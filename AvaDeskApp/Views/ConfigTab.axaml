@@ -4,48 +4,63 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:tx="clr-namespace:AvaApp.Texts" 
              xmlns:vm="using:AvaApp.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="500"
              x:Class="AvaApp.Views.ConfigTab">
   <Design.DataContext>
     <vm:ConfigTabViewModel/>
   </Design.DataContext>
 
   <UserControl.Styles>
+    <Style Selector="Expander">
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="MinHeight" Value="30"/>
+    </Style>
     <Style Selector="TextBlock">
       <Setter Property="VerticalAlignment" Value="Center"/>
       <Setter Property="Margin" Value="5 0 5 0"/>
     </Style>
     <Style Selector="TextBlock.h1">
+      <Setter Property="FontSize" Value="12"/>
       <Setter Property="FontWeight" Value="Bold"/>
       <Setter Property="Foreground" Value="Black"/>
-      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
       <Setter Property="TextAlignment" Value="Center"/>
       <Setter Property="Margin" Value="0"/>
-      <Setter Property="VerticalAlignment" Value="Stretch"/>
-      <Setter Property="Padding" Value="0 3 0 3"/>
+      <Setter Property="Padding" Value="0 3 5 3"/>
+    </Style>
+    <Style Selector="Viewbox">
+      <Setter Property="Height" Value="30"/>
+    </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="RadioButton">
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+      <Setter Property="Padding" Value="3"/>
     </Style>
     <Style Selector="DataValidationErrors">
       <Setter Property="Theme" Value="{StaticResource TooltipDataValidationErrors}" />
     </Style>    
   </UserControl.Styles>
 
-  <DockPanel>
+  <DockPanel MaxWidth="500">
     <Button Margin="5" DockPanel.Dock="Bottom" HorizontalAlignment="Right"
             Command="{Binding CmdSave}" IsEnabled="{Binding CanSave}"
             Content="{tx:Localize cfg_save}" />
     <ScrollViewer AllowAutoHide="False">
-      <StackPanel>
-        <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True"
-                  MinHeight="30" Padding="0" Width="370" >
+      <StackPanel Margin="0 0 15 0">
+        <Expander Header="{tx:Localize cfg_sc}" IsExpanded="True">
           <StackPanel Background="{StaticResource Back}">
-            <Grid ColumnDefinitions="2*,2*,3*,3*,3*" RowDefinitions="25" Background="Silver" ShowGridLines="True">
+            <Grid ColumnDefinitions="3*,4*,6*,6*,5*" Background="Silver">
               <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize cfg_sc_dow}"/>
               <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize cfg_sc_cut}"/>
               <TextBlock Grid.Column="2" Classes="h1" Text="{tx:Localize cfg_sc_beg}"/>
               <TextBlock Grid.Column="3" Classes="h1" Text="{tx:Localize cfg_sc_min}"/>
               <TextBlock Grid.Column="4" Classes="h1" Text="{tx:Localize cfg_sc_end}"/>
             </Grid>
-            <ItemsControl ItemsSource="{Binding SchedulerD}" Margin="0" Padding="0">
+            <ItemsControl ItemsSource="{Binding SchedulerD}">
               <ItemsControl.Styles>
                 <Style Selector="ItemsPresenter">
                   <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
@@ -53,22 +68,22 @@
               </ItemsControl.Styles>              
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Grid ColumnDefinitions="2*,2*,3*,3*,3*" RowDefinitions="27" ShowGridLines="True" Margin="0">
+                  <Grid ColumnDefinitions="3*,4*,6*,6*,5*" RowDefinitions="Auto" >
                     <TextBlock Grid.Column="0" Text="{Binding Wday}"/>
                     <Viewbox Grid.Column="1">
                       <CheckBox IsChecked="{Binding Edge}" HorizontalAlignment="Center" />
                     </Viewbox>
-                      <TextBox Grid.Column="2" Text="{Binding Beg}" HorizontalContentAlignment="Center"
-                               MinHeight="25" Margin="10 1" Padding="0" />
-                      <TextBox Grid.Column="3" Text="{Binding Min}" HorizontalContentAlignment="Right"
-                               MinHeight="25" Margin="10 1" Padding="5 0" />
+                    <TextBox Grid.Column="2" Text="{Binding Beg}" HorizontalContentAlignment="Center"
+                              MinHeight="25" Margin="5 1" Padding="5 0" />
+                    <TextBox Grid.Column="3" Text="{Binding Min}" HorizontalContentAlignment="Right"
+                              MinHeight="25" Margin="5 1" Padding="5 0" />
                     <TextBlock Grid.Column="4" Text="{Binding End}"
                                HorizontalAlignment="Right" Margin="10 1" />
                   </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <Grid ColumnDefinitions="Auto,250,40" RowDefinitions="Auto,Auto" Margin="0 0 0 10">
+            <Grid ColumnDefinitions="Auto,*,40" RowDefinitions="Auto,Auto" Margin="0 0 0 10">
               <TextBlock Grid.Column="0" Grid.Row="0" Text="{tx:Localize cfg_sc_perc}" VerticalAlignment="Center"/>
               <Slider Grid.Column="1" Grid.Row="0" Value="{Binding ScPerc}" Name="scp"
                       Minimum="-100" Maximum="100" LargeChange="25" />
@@ -102,49 +117,69 @@
           </StackPanel>
         </Expander>
 
-        <Expander Header="{tx:Localize cfg_mz}" IsExpanded="False"
-                  Width="370" MinHeight="30" Padding="0" >
+        <Expander Header="{tx:Localize cfg_mz}" IsExpanded="True">
           <StackPanel Background="{StaticResource Back}">
-            <StackPanel Orientation="Horizontal" Height="25" Background="Silver">
-              <TextBlock Text="{tx:Localize cfg_mz_sp}" Width="55" Classes="h1" />
-              <TextBlock Text="0" Width="25" Classes="h1" Background="{Binding ZoneBack[0]}" />
-              <TextBlock Text="1" Width="25" Classes="h1" Background="{Binding ZoneBack[1]}" />
-              <TextBlock Text="2" Width="25" Classes="h1" Background="{Binding ZoneBack[2]}" />
-              <TextBlock Text="3" Width="25" Classes="h1" Background="{Binding ZoneBack[3]}"/>
-              <TextBlock Text="4" Width="25" Classes="h1" Background="{Binding ZoneBack[4]}"/>
-              <TextBlock Text="5" Width="25" Classes="h1" Background="{Binding ZoneBack[5]}"/>
-              <TextBlock Text="6" Width="25" Classes="h1" Background="{Binding ZoneBack[6]}"/>
-              <TextBlock Text="7" Width="25" Classes="h1" Background="{Binding ZoneBack[7]}"/>
-              <TextBlock Text="8" Width="25" Classes="h1" Background="{Binding ZoneBack[8]}"/>
-              <TextBlock Text="9" Width="25" Classes="h1" Background="{Binding ZoneBack[9]}"/>
-              <TextBlock Text="{tx:Localize cfg_mz_perc}" Width="50" Classes="h1" />
-            </StackPanel>
+            <Grid ColumnDefinitions="2*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,2*" Background="Silver">
+              <TextBlock Grid.Column="0" Text="{tx:Localize cfg_mz_sp}" Classes="h1" />
+              <TextBlock Grid.Column="1" Text="0" Classes="h1" Foreground="{Binding ZoneHead[0]}"/>
+              <TextBlock Grid.Column="2" Text="1" Classes="h1" Foreground="{Binding ZoneHead[1]}"/>
+              <TextBlock Grid.Column="3" Text="2" Classes="h1" Foreground="{Binding ZoneHead[2]}"/>
+              <TextBlock Grid.Column="4" Text="3" Classes="h1" Foreground="{Binding ZoneHead[3]}"/>
+              <TextBlock Grid.Column="5" Text="4" Classes="h1" Foreground="{Binding ZoneHead[4]}"/>
+              <TextBlock Grid.Column="6" Text="5" Classes="h1" Foreground="{Binding ZoneHead[5]}"/>
+              <TextBlock Grid.Column="7" Text="6" Classes="h1" Foreground="{Binding ZoneHead[6]}"/>
+              <TextBlock Grid.Column="8" Text="7" Classes="h1" Foreground="{Binding ZoneHead[7]}"/>
+              <TextBlock Grid.Column="9" Text="8" Classes="h1" Foreground="{Binding ZoneHead[8]}"/>
+              <TextBlock Grid.Column="10" Text="9" Classes="h1" Foreground="{Binding ZoneHead[9]}"/>
+              <TextBlock Grid.Column="11" Text="{tx:Localize cfg_mz_perc}" Classes="h1" />
+            </Grid>
             <ItemsControl ItemsSource="{Binding MultiZone}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <StackPanel Orientation="Horizontal" >
-                    <NumericUpDown Value="{Binding Start}" Minimum="0" Maximum="350" ShowButtonSpinner="False"
-                                   HorizontalContentAlignment="Right" MinWidth="45" Margin="5 2 10 2" />
-                    <RadioButton IsChecked="{Binding Mz[0]}" GroupName="I0" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[1]}" GroupName="I1" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[2]}" GroupName="I2" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[3]}" GroupName="I3" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[4]}" GroupName="I4" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[5]}" GroupName="I5" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[6]}" GroupName="I6" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[7]}" GroupName="I7" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[8]}" GroupName="I8" Width="25" />
-                    <RadioButton IsChecked="{Binding Mz[9]}" GroupName="I9" Width="25" />
-                    <TextBlock Text="{Binding Sum, StringFormat='\{0\}%'}}" Width="40" HorizontalAlignment="Right" TextAlignment="Right" />
-                  </StackPanel>
+                  <Grid ColumnDefinitions="2*,1*,1*,1*,1*,1*,1*,1*,1*,1*,1*,2*">
+                    <TextBox Grid.Column="0" Text="{Binding Start}"
+                             Margin="5 1" Padding="5 3" HorizontalContentAlignment="Right"
+                             MinWidth="35" MinHeight="25"/>
+                    <Viewbox Grid.Column="1">
+                      <RadioButton IsChecked="{Binding Mz[0]}" GroupName="I0" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="2">
+                      <RadioButton IsChecked="{Binding Mz[1]}" GroupName="I1" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="3">
+                      <RadioButton IsChecked="{Binding Mz[2]}" GroupName="I2" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="4">
+                      <RadioButton IsChecked="{Binding Mz[3]}" GroupName="I3" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="5">
+                      <RadioButton IsChecked="{Binding Mz[4]}" GroupName="I4" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="6">
+                      <RadioButton IsChecked="{Binding Mz[5]}" GroupName="I5" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="7">
+                      <RadioButton IsChecked="{Binding Mz[6]}" GroupName="I6" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="8">
+                      <RadioButton IsChecked="{Binding Mz[7]}" GroupName="I7" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="9">
+                      <RadioButton IsChecked="{Binding Mz[8]}" GroupName="I8" />
+                    </Viewbox>
+                    <Viewbox Grid.Column="10">
+                      <RadioButton IsChecked="{Binding Mz[9]}" GroupName="I9" />
+                    </Viewbox>
+                    <TextBlock Grid.Column="11" Text="{Binding Sum, StringFormat='\{0\}%'}}"
+                               HorizontalAlignment="Right" TextAlignment="Right" />
+                  </Grid>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
           </StackPanel>
         </Expander>
 
-        <Expander Header="{tx:Localize cfg_more}" IsExpanded="True"
-                  Width="370" MinHeight="30" Padding="0" >
+        <Expander Header="{tx:Localize cfg_more}" IsExpanded="True">
           <Grid ColumnDefinitions="Auto, Auto" RowDefinitions="Auto, Auto" Background="{StaticResource Back}">
             <TextBlock Grid.Column="0" Grid.Row="0"
                        Text="{tx:Localize cfg_rain}" VerticalAlignment="Center" Margin="5 0 5 0" />

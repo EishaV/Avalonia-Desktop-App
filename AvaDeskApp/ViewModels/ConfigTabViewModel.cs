@@ -138,7 +138,7 @@ namespace AvaApp.ViewModels {
     }
     public ObservableCollection<ZoneEntry> MultiZone { get; set; }
 
-    public ObservableCollection<IBrush> ZoneBack { get; private set; }
+    public ObservableCollection<IBrush> ZoneHead { get; private set; }
 
     public int Rain { get; set; }
     public int Torque { get; set; }
@@ -167,7 +167,7 @@ namespace AvaApp.ViewModels {
         new ZoneEntry(0, [ false, false, false, false, false, false, false, false, false, false ]),
         new ZoneEntry(0, [ false, false, false, false, false, false, false, false, false, false ])
       ];
-      ZoneBack = [];
+      ZoneHead = [];
     }
 
     private int _id = -1;
@@ -201,8 +201,8 @@ namespace AvaApp.ViewModels {
               foreach(var x in c.MultiZonePercs) mzv.Add(x == i);
               MultiZone.Add(new ZoneEntry(c.MultiZones[i], mzv));
             }
-            ZoneBack.Clear();
-            for(int i = 0; i < 10; i++) ZoneBack.Add(i == m.Dat.LastZone ? Brushes.White : Brushes.Transparent);
+            ZoneHead.Clear();
+            for(int i = 0; i < 10; i++) ZoneHead.Add(i == m.Dat.LastZone ? Brushes.White : Brushes.Black);
           }
           Rain = c.RainDelay; this.RaisePropertyChanged(nameof(Rain));
           HasTq = c.Torque != null; this.RaisePropertyChanged(nameof(HasTq));
