@@ -8,11 +8,11 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using ReactiveUI;
 
 using Positec;
 using AvaApp.Texts;
-using Avalonia.Styling;
 
 namespace AvaApp.ViewModels {
   public class StatusViewModel : ReactiveObject {

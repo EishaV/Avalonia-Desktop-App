@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -14,6 +17,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Enums;
@@ -21,10 +25,6 @@ using MsBox.Avalonia.Enums;
 using Plugin;
 using Positec;
 using AvaApp.Views;
-using Avalonia.Styling;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace AvaApp.ViewModels {
   [DataContract]
@@ -377,10 +377,9 @@ namespace AvaApp.ViewModels {
           MowNames.Add("Simulation");
           this.RaisePropertyChanged(nameof(MowNames));
           Name = "Simulation";
-          _fsw = new(dir, name);
-          _fsw.NotifyFilter = NotifyFilters.LastWrite;
+          _fsw = new(dir, name) { NotifyFilter = NotifyFilters.LastWrite };
           _fsw.Changed += Watcher_Changed;
-          _fsw.Created += _fsw_Created;
+          _fsw.Created += Watcher_Created;
           _fsw.EnableRaisingEvents = true;
         }
       }
@@ -396,7 +395,7 @@ namespace AvaApp.ViewModels {
       if( _mb is MowerP0 mo && DeskApp.GetJson<MqttP0>(path) is MqttP0 m0 ) mo.Mqtt = m0;
     }
     
-    private void _fsw_Created(object sender, FileSystemEventArgs e) {
+    private void Watcher_Created(object sender, FileSystemEventArgs e) {
       throw new NotImplementedException();
     }
 

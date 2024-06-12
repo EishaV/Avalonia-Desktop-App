@@ -5,24 +5,19 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
-using System.Text;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Enums;
 using ReactiveUI;
 
 using Positec;
-using CSScripting;
 
 namespace AvaApp.ViewModels {
   public class ConfigTabViewModel : ViewModelBase {
@@ -114,7 +109,7 @@ namespace AvaApp.ViewModels {
       public void ReSum() {
         int p = 0;
 
-        foreach( bool b in Mz ) { p += b ? 10 : 0; }
+        foreach( bool b in Mz ) p += b ? 10 : 0;
         Sum = p;
         this.RaisePropertyChanged(nameof(Sum));
       }
@@ -127,7 +122,7 @@ namespace AvaApp.ViewModels {
       get { return _ScPerc; }
       set {
         this.RaiseAndSetIfChanged(ref _ScPerc, value);
-        SchedulerD.ForEach(d => d.CalcEnd());
+        foreach( SchedulerEntry se in SchedulerD ) se.CalcEnd();
       }
     } int _ScPerc;
     public void CmdScPerc(object para) {

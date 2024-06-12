@@ -102,22 +102,23 @@
       </TabItem>
 
       <TabItem Header="Mqtt">
-        <Grid ColumnDefinitions="Auto,5,*,5,Auto" RowDefinitions="*,5,Auto">
-          <TextBox Grid.ColumnSpan="5" IsReadOnly="True"
+        <Grid ColumnDefinitions="Auto,5,*,Auto" RowDefinitions="*,Auto">
+          <TextBox Grid.ColumnSpan="4" IsReadOnly="True"
                    ScrollViewer.HorizontalScrollBarVisibility="Visible"
                    ScrollViewer.VerticalScrollBarVisibility="Visible"
                    Text="{Binding MqttJson}" />
-          <TextBlock Grid.Column="0" Grid.Row="2" VerticalAlignment="Center"
+          <TextBlock Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"
                      Text="CmdIn-String" />
-          <AutoCompleteBox Grid.Column="2" Grid.Row="2" Watermark="Press quote for examples"
-                           ItemsSource="{Binding MqttIns}" Text="{Binding MqttIn}"/>
-          <Button Grid.Column="4" Grid.Row="2"
+          <AutoCompleteBox Grid.Column="2" Grid.Row="1" Watermark="Press quote for examples"
+                           ItemsSource="{Binding MqttIns}" Text="{Binding MqttIn}"
+                           VerticalAlignment="Center"/>
+          <Button Grid.Column="3" Grid.Row="1" Margin="5"
                   IsEnabled="{Binding CanSend}" Command="{Binding MqttCmd}">Send</Button>
         </Grid>
       </TabItem>
 
       <TabItem Header="{tx:Localize act}" IsVisible="{Binding CanTabAct}">
-        <Grid ColumnDefinitions="*" RowDefinitions="Auto,*,5,Auto">
+        <Grid ColumnDefinitions="*" RowDefinitions="Auto,*,Auto">
           <Grid.Styles>
             <Style Selector="TextBlock">
               <Setter Property="Margin" Value="0"/>
@@ -156,7 +157,8 @@
               </ItemsControl.ItemTemplate>
             </ItemsControl>
           </ScrollViewer>
-          <Button Grid.Row="3" Command="{Binding ActCmdJson}" HorizontalAlignment="Right">Json...</Button>
+          <Button Grid.Row="2" Command="{Binding ActCmdJson}"
+                  Margin="5" HorizontalAlignment="Right">Json...</Button>
         </Grid>
 
 <!--
