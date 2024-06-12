@@ -10,9 +10,13 @@
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key='Back'>LightGray</SolidColorBrush>
+          <SolidColorBrush x:Key='Hint'>LightYellow</SolidColorBrush>
+          <SolidColorBrush x:Key='Split'>Black</SolidColorBrush>
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key='Back'>DimGray</SolidColorBrush>
+          <SolidColorBrush x:Key='Hint'>DarkGoldenRod</SolidColorBrush>
+          <SolidColorBrush x:Key='Split'>White</SolidColorBrush>
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>

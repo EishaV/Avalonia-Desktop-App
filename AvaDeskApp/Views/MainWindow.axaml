@@ -10,7 +10,7 @@
         x:DataType="vm:MainWindowViewModel"
         Title="AvaDeskApp"
         Icon="/Assets/AvaMow.ico"
-        MinWidth="410" MinHeight="520"
+        MinWidth="350" MinHeight="500"
         >
 
   <Design.DataContext>

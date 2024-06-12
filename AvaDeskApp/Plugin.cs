@@ -114,6 +114,7 @@ namespace Plugin {
   public static class DeskApp {
     public static string DirData => Path.Combine(AppContext.BaseDirectory, "Data");
     public static string DirTrace => Path.Combine(AppContext.BaseDirectory, "Trace");
+    public static string DirPlugin => Path.Combine(AppContext.BaseDirectory, "Plugins");
 
     public static DelegateSend? SendDelegate { get; set; }
     public static DelegateTrace? TraceDelegate { get; set; }

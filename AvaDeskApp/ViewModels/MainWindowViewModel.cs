@@ -185,6 +185,20 @@ namespace AvaApp.ViewModels {
       if( Client is PositecApi pa ) pa.Publish(json, Name);
     }
 
+    public void Publish(string json, string name) {
+      foreach( PositecApi pa in DicCli.Values ) {
+        foreach( MowerBase mb in pa.Mowers.Values ) {
+          if( mb.Product.Name == name ) pa.Publish(json, Name);
+        }
+      }
+    }
+
+    public static void Publish(string json, int idx) {
+      MainWindowViewModel mwvm = MainWindowViewModel.Instance;
+
+      if( 0 <= idx && idx < mwvm.MowNames.Count ) mwvm.Publish(json, mwvm.MowNames[idx]);
+    }
+
     #region Constructor's
     public static MainWindowViewModel Instance => _Instance;
     private static readonly MainWindowViewModel _Instance;
@@ -319,7 +333,7 @@ namespace AvaApp.ViewModels {
           //Dispatcher.UIThread.InvokeAsync(() => ConfigVM.Refresh(mo.Mqtt, false));
         }
       }
-      if( DicCli[e.Api] is PositecApi pa && pa?.Mowers[e.Key] is MowerP0 mp ) PluginVM?.ToDo(Version, e.Key, mp.Mqtt);
+      if( DicCli[e.Api] is PositecApi pa && pa?.Mowers[e.Key] is MowerP0 mp ) PluginVM?.CmdToDo(Version, e.Key, mp.Mqtt);
     }
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {

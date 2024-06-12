@@ -31,6 +31,8 @@ namespace AvaApp.ViewModels {
 
     // Check if we can accept the provided data
     public bool Match(object? data) {
+      if( data is PluginParaBase ppb ) return AvailableTemplates.ContainsKey(ppb.ParaType.ToString());
+
       // Our Keys in the dictionary are strings, so we call .ToString() to get the key to look up
       var key = data?.ToString();
 
@@ -64,9 +66,9 @@ namespace AvaApp.ViewModels {
       set { 
         this.RaiseAndSetIfChanged(ref _SelPlugin, value);
         if( SelPlugin != null ) {
-          PluginData = SelPlugin.Script.Paras;
+          ParaList = SelPlugin.Script.Paras;
           this.RaisePropertyChanged(nameof(PluginDesc));
-          this.RaisePropertyChanged(nameof(PluginData));
+          this.RaisePropertyChanged(nameof(ParaList));
           this.RaisePropertyChanged(nameof(CanDoIt));
           ParaDesc = string.Empty;
           this.RaisePropertyChanged(nameof(ParaDesc));
@@ -75,7 +77,7 @@ namespace AvaApp.ViewModels {
     } PluginEntry? _SelPlugin = null;
     public string PluginDesc => SelPlugin?.Desc ?? string.Empty;
 
-    public List<PluginParaBase> PluginData { get; private set; }
+    public List<PluginParaBase> ParaList { get; private set; }
 
     //public int PluginIdx {
     //  get { return _PluginIdx; }
@@ -92,17 +94,17 @@ namespace AvaApp.ViewModels {
     //  this.RaisePropertyChanged(nameof(ParaDesc));
     //}
 
-    public PluginParaBase? PluginDataSel {
-      get { return _PluginDataSel; }
+    public PluginParaBase? SelPara {
+      get { return _SelPara; }
       set {
-        _PluginDataSel = value;
+        _SelPara = value;
         if( value != null ) {
           ParaDesc = value.Description;
           this.RaisePropertyChanged(nameof(ParaDesc));
         }
       }
     }
-    PluginParaBase? _PluginDataSel;
+    PluginParaBase? _SelPara;
 
     public string ParaDesc { get; private set; }
 
@@ -115,7 +117,7 @@ namespace AvaApp.ViewModels {
         return SelPlugin != null && mw.Online; // && mw.SelMow              idx != -1 && _client.Mowers[idx] != null && _client.Mowers[idx] is MowerP0;
       }
     }
-    public void PluginCmd() {
+    public void CmdDoIt() {
       if( SelPlugin != null ) {
         MowerBase? mb = MainWindowViewModel.Instance.Mower;
 
@@ -132,7 +134,7 @@ namespace AvaApp.ViewModels {
       }
     }
 
-    public void ToDo(Version v, string k, MqttP0 m) {
+    public void CmdToDo(Version v, string k, MqttP0 m) {
       PluginData pd = new() { Version = v, Name = k, Config = m.Cfg, Data = m.Dat };
 
       foreach( PluginEntry pe in PluginList ) if( pe.Check ) Dispatcher.UIThread.InvokeAsync(() => pe.Script.Todo(pd));
@@ -140,11 +142,11 @@ namespace AvaApp.ViewModels {
 
     public PluginTabViewModel() {
       PluginList = [
-        new PluginEntry("Plugin 01", true, new DesignPlugin("The descrition of the plugin 1 at design time ...")),
-        new PluginEntry("Plugin 02", true, new DesignPlugin("The descrition of the plugin 2 at design time ..."))
+        new PluginEntry("Plugin 01", true, new DesignPlugin("The description of the plugin 1 at design time ...")),
+        new PluginEntry("Plugin 02", true, new DesignPlugin("The description of the plugin 2 at design time ..."))
       ];
       foreach( var pe in PluginList ) pe.PropertyChanged += ItemChanged;
-      PluginData = [];
+      ParaList = [];
       ParaDesc = string.Empty;
     }
 
@@ -156,7 +158,12 @@ namespace AvaApp.ViewModels {
     internal class DesignPlugin(string desc) : IPlugin {
       readonly string _desc = desc;
       string IPlugin.Desc => _desc;
-      List<PluginParaBase> IPlugin.Paras => [];
+      List<PluginParaBase> IPlugin.Paras => [
+        new PluginParaBool("Parameter Bool", false, "Long description of parameter boolean at design time ..."),
+        new PluginParaText("Parameter Text", "Text", "..."),
+        new PluginParaCase("Parameter Enum", 0, ["Case 1", "Case 2"], "..."),
+        new PluginParaReal("Parameter Real", 123.456, "...")
+      ];
       void IPlugin.Doit(PluginData pd) { }
       void IPlugin.Todo(PluginData pd) { }
       void IDisposable.Dispose() { }
@@ -164,12 +171,13 @@ namespace AvaApp.ViewModels {
 
     private void LogPlugin(string log) { Trace.TraceInformation(log); }
     internal void Init(List<string>? cfg) {
-      string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+      string dir = DeskApp.DirPlugin;
       Stopwatch sw = Stopwatch.StartNew();
 
       PluginList.Clear();
       Trace.TraceInformation($"Plugin.Init Beg => {sw.ElapsedMilliseconds}");
       DeskApp.TraceDelegate = LogPlugin;
+      DeskApp.SendDelegate = MainWindowViewModel.Publish;
 
       Trace.TraceInformation($"Plugin.Init Hdl => {sw.ElapsedMilliseconds}");
       SelPlugin = null;
