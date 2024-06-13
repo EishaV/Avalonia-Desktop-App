@@ -63,8 +63,8 @@ namespace AvaApp.ViewModels {
   }
 
   public class MainWindowViewModel : ViewModelBase {
-    internal static string GetConfigFile() => Path.Combine(DeskApp.DirData, "AvaApp.config.json");
-    internal static string GetTraceFile(int i) => Path.Combine(DeskApp.DirTrace, $"AvaApp.trace.{i}.txt");
+    internal static string GetConfigFile() => Path.Combine(DeskApp.DirData, "AvaDeskApp.config.json");
+    internal static string GetTraceFile(int i) => Path.Combine(DeskApp.DirTrace, $"AvaDeskApp.trace.{i}.txt");
 
     public CfgJson Config => _Config;
     private readonly CfgJson _Config = new();

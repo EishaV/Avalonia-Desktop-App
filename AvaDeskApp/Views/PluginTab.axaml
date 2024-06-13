@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:AvaApp.ViewModels"
              xmlns:plugin="using:Plugin"
-             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="500"
              x:Class="AvaApp.Views.PluginTab">
   <Design.DataContext>
     <vm:PluginTabViewModel/>
@@ -13,10 +13,10 @@
 
   <UserControl.Styles>
     <Style Selector="ListBoxItem">
-      <Setter Property="Padding" Value="5 0"/>
+      <Setter Property="Padding" Value="5 2"/>
     </Style>
   </UserControl.Styles>
-  <Grid ColumnDefinitions="*">
+  <Grid ColumnDefinitions="*" Background="{StaticResource Back}">
     <Grid.RowDefinitions>
       <RowDefinition Height="2*" MinHeight="100" />
       <RowDefinition Height="Auto" />
@@ -24,9 +24,8 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <Grid Grid.Row="0" RowDefinitions="*,42">
-      <ScrollViewer Grid.Row="0" AllowAutoHide="False">
-        <ListBox ItemsSource="{Binding PluginList}" SelectionMode="Single" SelectedItem="{Binding SelPlugin}"
-                 Background="{StaticResource Back}">
+      <!--<ScrollViewer Grid.Row="0" AllowAutoHide="False">-->
+        <ListBox ItemsSource="{Binding PluginList}" SelectionMode="Single" SelectedItem="{Binding SelPlugin}">
           <ListBox.ItemTemplate>
             <DataTemplate>
               <StackPanel Orientation="Horizontal" Height="25">
@@ -36,29 +35,22 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
-      </ScrollViewer>
-      <ScrollViewer Grid.Row="2" AllowAutoHide="False" Background="{DynamicResource Hint}">
+      <!--</ScrollViewer>-->
+      <ScrollViewer Grid.Row="2" AllowAutoHide="False" Background="#51FFEB82"> <!--255,235,130,0.2-->
         <TextBlock Text="{Binding PluginDesc}" TextWrapping="Wrap" Margin="5 2 20 2" />
       </ScrollViewer>
 
     </Grid>
     <GridSplitter Grid.Row="1" ResizeDirection="Rows" Background="{DynamicResource Split}"  />
     <Grid Grid.Row="2" RowDefinitions="*,42">
-      <ScrollViewer Grid.Row="0" AllowAutoHide="False" Background="{StaticResource Back}" >
+      <!--<ScrollViewer Grid.Row="0" AllowAutoHide="False" Background="{StaticResource Back}" >-->
+      <!-- Grid.IsSharedSizeScope="True" -->
         <ListBox ItemsSource="{Binding ParaList}" SelectedItem="{Binding SelPara}" Name="ListPara"
-                 SelectionMode="Single" Grid.IsSharedSizeScope="True" >
+                 SelectionMode="Single">
           <ListBox.ItemTemplate>
             <DataTemplate>
-              <Grid Margin="0 2">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="Auto" SharedSizeGroup="C"/>
-                  <ColumnDefinition Width="5"/>
-                  <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                  <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Column="0" Text="{Binding Caption}" VerticalAlignment="Center" />
+              <Grid ColumnDefinitions="*,5,Auto" >
+                <TextBlock Grid.Column="0" Text="{Binding Caption}" VerticalAlignment="Center" TextWrapping="Wrap" />
                 <ContentControl Grid.Column="2" Content="{Binding}" />
               </Grid>
             </DataTemplate>
@@ -67,24 +59,24 @@
             <vm:ParaTypeSelector>
               <DataTemplate x:Key="Text" DataType="plugin:ParaType">
                 <TextBox Text="{Binding Text}" IsReadOnly="{Binding ReadOnly}"
-                         MinWidth="150" GotFocus="Para_OnGotFocus" />
+                         MinWidth="140" GotFocus="Para_OnGotFocus" />
               </DataTemplate>
               <DataTemplate x:Key="Bool" DataType="plugin:ParaType">
                 <CheckBox IsChecked="{Binding Check}"/>
               </DataTemplate>
               <DataTemplate x:Key="Case" DataType="plugin:ParaType">
                 <ComboBox SelectedIndex="{Binding Index}" ItemsSource="{Binding Items}"
-                          MinWidth="150"/>
+                          MinWidth="140"/>
               </DataTemplate>
               <DataTemplate x:Key="Real" DataType="plugin:ParaType">
                 <NumericUpDown Value="{Binding Real}" Minimum="{Binding Min}" Maximum="{Binding Max}"
-                               MinWidth="150" GotFocus="Para_OnGotFocus"/>
+                               MinWidth="140" GotFocus="Para_OnGotFocus"/>
               </DataTemplate>
             </vm:ParaTypeSelector>
           </ListBox.DataTemplates>
         </ListBox>
-      </ScrollViewer>
-      <ScrollViewer Grid.Row="1" AllowAutoHide="False" Background="{DynamicResource Hint}">
+      <!--</ScrollViewer>-->
+      <ScrollViewer Grid.Row="1" AllowAutoHide="False" Background="#51FFEB82">
         <TextBlock Text="{Binding ParaDesc}" TextWrapping="Wrap" Margin="5 2 20 2" />
       </ScrollViewer>
     </Grid>

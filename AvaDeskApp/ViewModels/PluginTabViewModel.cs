@@ -143,7 +143,9 @@ namespace AvaApp.ViewModels {
     public PluginTabViewModel() {
       PluginList = [
         new PluginEntry("Plugin 01", true, new DesignPlugin("The description of the plugin 1 at design time ...")),
-        new PluginEntry("Plugin 02", true, new DesignPlugin("The description of the plugin 2 at design time ..."))
+        new PluginEntry("Plugin 02", true, new DesignPlugin("The description of the plugin 2 at design time ...")),
+        new PluginEntry("Plugin 03", true, new DesignPlugin("The description of the plugin 3 at design time ...")),
+        new PluginEntry("Plugin 04", true, new DesignPlugin("The description of the plugin 4 at design time ..."))
       ];
       foreach( var pe in PluginList ) pe.PropertyChanged += ItemChanged;
       ParaList = [];
