@@ -25,6 +25,7 @@ using MsBox.Avalonia.Enums;
 using Plugin;
 using Positec;
 using AvaApp.Views;
+using static AvaApp.ViewModels.ConfigTabViewModel;
 
 namespace AvaApp.ViewModels {
   [DataContract]
@@ -48,6 +49,7 @@ namespace AvaApp.ViewModels {
     [DataMember(Name = "name")] public string? Name;
     [DataMember(Name = "frame")] public CfgFrame Frame;
     [DataMember(Name = "plugins")] public List<string>? Plugins;
+    [DataMember(Name = "mode", EmitDefaultValue =false)] public string? Mode;
 
     public bool Equals(CfgJson cfg) {
       bool b;
@@ -63,8 +65,8 @@ namespace AvaApp.ViewModels {
   }
 
   public class MainWindowViewModel : ViewModelBase {
-    internal static string GetConfigFile() => Path.Combine(DeskApp.DirData, "AvaDeskApp.config.json");
-    internal static string GetTraceFile(int i) => Path.Combine(DeskApp.DirTrace, $"AvaDeskApp.trace.{i}.txt");
+    internal static string GetConfigFile() => Path.Combine(PositecApi.DirData, "AvaDeskApp.config.json");
+    internal static string GetTraceFile(int i) => Path.Combine(PositecApi.DirTrace, $"AvaDeskApp.trace.{i}.txt");
 
     public CfgJson Config => _Config;
     private readonly CfgJson _Config = new();
@@ -134,7 +136,8 @@ namespace AvaApp.ViewModels {
       set {
         this.RaiseAndSetIfChanged(ref _TabIdx, value);
         this.RaisePropertyChanged(nameof(CanPoll));
-        if( TabIdx == 2 && Mower is MowerP0 mo ) ConfigVM?.Refresh(mo.Mqtt, true);
+        if( TabIdx == 1 && Mower is MowerP0 mo ) ConfigVM?.Refresh(mo.Mqtt, true);
+        if( TabIdx == 2 ) this.RaisePropertyChanged(nameof(CanSend));
         if( TabIdx == 3 && Activities.Count == 0 ) Dispatcher.UIThread.InvokeAsync(() => ActCmdCall());
       }
     }
@@ -241,17 +244,13 @@ namespace AvaApp.ViewModels {
       StatusVM = new StatusViewModel();
       PluginVM = new PluginTabViewModel();
 
-      if( cfg.Api != null ) {
-        UsrApi = UsrApis.FirstOrDefault(x => x.StartsWith(cfg.Api));
-        this.RaisePropertyChanged(nameof(UsrApi));
-      }
       UsrMail = cfg.Mail; this.RaisePropertyChanged(nameof(UsrMail));
       _Config = cfg;
     }
     #endregion
 
     #region Account
-    public static List<string> UsrApis => [ "WX - Worx Landroid", "KR - Kress Mission", "LX - LandXcape", "SM - Ferrex Smartmower", "SI - Simulation" ];
+    public static List<string> UsrApis => [.. PositecApi.ApiDic.Keys];
     public string? UsrApi { get; set; }
     public string? UsrMail { get; set; }
     public string? UsrPass { get; set; }
@@ -281,18 +280,18 @@ namespace AvaApp.ViewModels {
       lasterror = string.Empty;
       if( UsrApi != null && UsrMail != null && UsrPass != null ) {
         Button? b = AppMainWindow?.FindControl<Button>("BtnAcc");
-        string api = UsrApi[..2];
+        string api2 = UsrApi[..2];
         string mail = UsrMail;
         string pass = UsrPass;
-        PositecApi pa = new(Err, api);
+        PositecApi pa = new(Err, api2);
 
         b?.Flyout?.Hide();
-        Trace.TraceInformation($"Main.Login {api} {mail}");
+        Trace.TraceInformation($"Main.Login {api2} {mail}");
 
-        EndAPi(api);
-        if( await pa.Login(api, mail, pass) && pa.Mowers.Count > 0 ) {
-          Trace.TraceInformation($"Main.Login Start {api} Mqtt");
-          if( await BegApi(api, pa) ) {
+        EndAPi(api2);
+        if( await pa.Login(api2, mail, pass) && pa.Mowers.Count > 0 ) {
+          Trace.TraceInformation($"Main.Login Start {api2} Mqtt");
+          if( await BegApi(api2, pa) ) {
             Trace.TraceInformation($"Main.Login success");
             Name = pa.Mowers.Keys.First();
             if( StatusVM != null ) StatusVM.CanPoll = pa.Connected;
@@ -341,10 +340,34 @@ namespace AvaApp.ViewModels {
       bool acc = false;
 
       Trace.TraceInformation($"Main.Open Beg => {sw.ElapsedMilliseconds}");
+      if( Application.Current is Application a ) a.RequestedThemeVariant = Config.Mode == "L" ? ThemeVariant.Light : ThemeVariant.Dark;
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
-      if( _Config.Api != "SI" ) {
+      if( Config.Api != null) {
+        UsrApi = UsrApis.FirstOrDefault(x => x.StartsWith(Config.Api));
+        this.RaisePropertyChanged(nameof(UsrApi));
+      }
+
+      if( UsrApi == "IO" ) {
+        string dir = PositecApi.DirData, name = "CmdOut.json";
+        ProductItem? pi = DeskApp.GetJson<ProductItem>(Path.Combine(dir, "ProductItem.json"));
+
+        if( pi != null ) {
+          Trace.TraceInformation($"Main.Open Api IO => {sw.ElapsedMilliseconds}");
+          if( pi.Protocol == 0 ) _mb = new MowerP0() { Product = pi };
+          this.RaisePropertyChanged(nameof(CanTabAct));
+          CheckCmdOut(Path.Combine(dir, name));
+          UpdateMqtt();
+          MowNames.Add("Dummy");
+          this.RaisePropertyChanged(nameof(MowNames));
+          Name = "Dummy";
+          _fsw = new(dir, name) { NotifyFilter = NotifyFilters.LastWrite };
+          _fsw.Changed += Watcher_Changed;
+          _fsw.Created += Watcher_Created;
+          _fsw.EnableRaisingEvents = true;
+        }
+      } else {
         foreach( string tf in Directory.GetFiles(PositecApi.DirData, "Token.??.json") ) {
           string api = tf.Substring(tf.Length - 7, 2);
           PositecApi pa = new(Err, Uuid);
@@ -363,24 +386,6 @@ namespace AvaApp.ViewModels {
           Button? b = AppMainWindow?.FindControl<Button>("BtnAcc");
 
           b?.Flyout?.ShowAt(b);
-        }
-      } else {
-        string dir = PositecApi.DirData, name = "CmdOut.json";
-        ProductItem? pi = DeskApp.GetJson<ProductItem>(Path.Combine(dir, "ProductItem.json"));
-
-        if( pi != null ) {
-          Trace.TraceInformation($"Main.Open Api SI => {sw.ElapsedMilliseconds}");
-          if( pi.Protocol == 0 ) _mb = new MowerP0() { Product = pi };
-          this.RaisePropertyChanged(nameof(CanTabAct));
-          CheckCmdOut(Path.Combine(dir, name));
-          UpdateMqtt();
-          MowNames.Add("Simulation");
-          this.RaisePropertyChanged(nameof(MowNames));
-          Name = "Simulation";
-          _fsw = new(dir, name) { NotifyFilter = NotifyFilters.LastWrite };
-          _fsw.Changed += Watcher_Changed;
-          _fsw.Created += Watcher_Created;
-          _fsw.EnableRaisingEvents = true;
         }
       }
       Splash = false; this.RaisePropertyChanged(nameof (Splash));
@@ -412,9 +417,10 @@ namespace AvaApp.ViewModels {
         cfg.Frame = new() { X = mw.Position.X, Y = mw.Position.Y, W = mw.Width, H = mw.Height };
       }
       cfg.Uuid = Uuid;
-      if( !string.IsNullOrEmpty(UsrApi) ) cfg.Api = UsrApi[..2];
+      cfg.Api = UsrApi;
       cfg.Mail = UsrMail;
       cfg.Name = Name;
+      cfg.Mode = Application.Current?.ActualThemeVariant == ThemeVariant.Light ? "L" : "D";
       PluginVM?.Fini(out cfg.Plugins);
       DeskApp.PutJson(GetConfigFile(), cfg);
     }

@@ -99,11 +99,8 @@ namespace Positec {
     public MqttP1 Mqtt { get; set; } = new MqttP1();
   }
 
-  public class RecvEventArgs : EventArgs {
-    public string Api { get; set; }
-    public string Key { get; set; }
-
-    public RecvEventArgs(string api, string key) { Api = api; Key = key; }
+  public class RecvEventArgs(string api, string key) : EventArgs {
+    public string Api { get; set; } = api; public string Key { get; set; } = key;
   }
   public class PositecApi {
     private readonly HttpClient httpClient = new();
@@ -130,6 +127,25 @@ namespace Positec {
     private string _api;
 
     public Dictionary<string, MowerBase> Mowers = [];
+
+    public static ApiDic ApiDic { get; private set; }
+    static PositecApi() {
+      string path = Path.Combine(AppContext.BaseDirectory, "PositecApi.json");
+      ApiDic? da = null;
+
+      if( File.Exists(path) ) {
+        string str= File.ReadAllText(path);
+
+        da = Json.Read<ApiDic>(str);
+      }
+      da ??= new() {
+          { "WX - Worx Landroid", new ApiEntry() { Login = "https://id.worx.com/", WebApi = "https://api.worxlandroid.com/api/v2/", ClientId = "013132A8-DB34-4101-B993-3C8348EA0EBC" } },
+          { "KR - Kress Mission", new ApiEntry() { Login = "https://id.kress.com/", WebApi = "https://api.kress-robotik.com/api/v2/", ClientId = "62FA25FB-3509-4778-A835-D5C50F4E5D88" } },
+          { "LX - LandXcape", new ApiEntry() { Login = "https://id.landxcape-services.com/", WebApi = "https://api.landxcape-services.com/api/v2/", ClientId = "4F1B89F0-230F-410A-8436-D9610103A2A4" } },
+          { "SM - Ferrex Smartmower", new ApiEntry() { Login = "https://id.watermelon.smartmower.cloud/", WebApi = "https://api.watermelon.smartmower.cloud/api/v2/", ClientId = "AFD0DA53-FC0C-49FA-9A8F-1C2342F95E3E" } }
+        };
+      ApiDic = da;
+    }
 
     public PositecApi(ErrDelegte err, string uid) {
       var fac = new MqttFactory(); //.UseWebSocket4Net();
@@ -271,29 +287,18 @@ namespace Positec {
     //  Debug.WriteLine("Auto upgd: {0}", str);
     //}
     private bool InitApi(string api) {
-      ApiDic? da = new() {
-        { "WX", new ApiEntry() { Login = "https://id.worx.com/", WebApi = "https://api.worxlandroid.com/api/v2/", ClientId = "013132A8-DB34-4101-B993-3C8348EA0EBC" } },
-        { "KR", new ApiEntry() { Login = "https://id.kress.com/", WebApi = "https://api.kress-robotik.com/api/v2/", ClientId = "62FA25FB-3509-4778-A835-D5C50F4E5D88" } },
-        { "LX", new ApiEntry() { Login = "https://id.landxcape-services.com/", WebApi = "https://api.landxcape-services.com/api/v2/", ClientId = "4F1B89F0-230F-410A-8436-D9610103A2A4" } },
-        { "SM", new ApiEntry() { Login = "https://id.watermelon.smartmower.cloud/", WebApi = "https://api.watermelon.smartmower.cloud/api/v2/", ClientId = "AFD0DA53-FC0C-49FA-9A8F-1C2342F95E3E" } }
-      };
-      string path = Path.Combine(AppContext.BaseDirectory, "PositecApi.json");
-      string str;
-
-      if( File.Exists(path) ) {
-        str = File.ReadAllText(path);
-        da = Json.Read<ApiDic>(str);
-      }
+      KeyValuePair<string, ApiEntry> nae = ApiDic.FirstOrDefault(x => x.Key.StartsWith(api));
 
       _api = api;
-      if( da != null && da[api] is ApiEntry ae && ae.Login != null && ae.WebApi != null && ae.ClientId != null ) {
+      if( nae.Value is ApiEntry ae && ae.Login != null && ae.WebApi != null && ae.ClientId != null ) {
         UrlLgn = ae.Login;
         UrlApi = ae.WebApi;
         CliId = ae.ClientId;
       }
 
       if( _api == null || UrlLgn == null || UrlApi == null || CliId == null ) {
-        str = $"API-Prefix: {_api}, Login-Uri: {UrlLgn}, API-Uri: {UrlApi}, Client-Id: {CliId}";
+        string str = $"API-Prefix: {_api}, Login-Uri: {UrlLgn}, API-Uri: {UrlApi}, Client-Id: {CliId}";
+
         Err($"Intern data error => {str}");
         Trace.TraceError($"WebApi null data {str}");
         return false;

@@ -27,21 +27,15 @@ namespace Plugin {
   #region Plugin Parameter
   public enum ParaType { Text, Real, Case, Bool }
 
-  public class PluginParaBase : INotifyPropertyChanged {
-    public ParaType ParaType { get; private set; }
-    public string Caption { get; private set; }
-    public string Description { get; private set; }
+  public class PluginParaBase(ParaType type, string caption, string description) : INotifyPropertyChanged {
+    public ParaType ParaType { get; private set; } = type;
+    public string Caption { get; private set; } = caption;
+    public string Description { get; private set; } = description;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     internal void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public PluginParaBase(ParaType type, string caption, string description) {
-      ParaType = type;
-      Caption = caption;
-      Description = description;
     }
   }
 
@@ -112,8 +106,7 @@ namespace Plugin {
 
   #region Static DeskApp
   public static class DeskApp {
-    public static string DirData => Path.Combine(AppContext.BaseDirectory, "Data");
-    public static string DirTrace => Path.Combine(AppContext.BaseDirectory, "Trace");
+    public static string DirData => PositecApi.DirData;
     public static string DirPlugin => Path.Combine(AppContext.BaseDirectory, "Plugins");
 
     public static DelegateSend? SendDelegate { get; set; }

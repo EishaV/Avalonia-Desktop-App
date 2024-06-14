@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Globalization;
 
 using Positec;
 using Plugin;
-using System.Collections.Generic;
 
 public class PluginCsvLogWriter : IPlugin {
   private void Write(PluginData pd) {

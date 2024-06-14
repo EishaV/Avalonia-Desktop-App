@@ -5,12 +5,12 @@
         xmlns:views="clr-namespace:AvaApp.Views"
         xmlns:tx="clr-namespace:AvaApp.Texts" 
         xmlns:vm="using:AvaApp.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="450"
         x:Class="AvaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AvaDeskApp"
         Icon="/Assets/AvaMow.ico"
-        MinWidth="400" MinHeight="500"
+        MinWidth="350" MinHeight="500"
         >
 
   <Design.DataContext>
@@ -23,7 +23,7 @@
     <StreamGeometry x:Key="dark">M12,22 C17.5228475,22 22,17.5228475 22,12 C22,6.4771525 17.5228475,2 12,2 C6.4771525,2 2,6.4771525 2,12 C2,17.5228475 6.4771525,22 12,22 Z M12,20.5 L12,3.5 C16.6944204,3.5 20.5,7.30557963 20.5,12 C20.5,16.6944204 16.6944204,20.5 12,20.5 Z</StreamGeometry>    <StreamGeometry x:Key="home_regular">M21.6062 5.85517C23.0048 4.71494 24.9952 4.71494 26.3938 5.85517L39.5688 16.5966C40.4736 17.3342 41 18.4492 41 19.628V39.1134C41 41.2599 39.2875 43 37.175 43H32.075C29.9625 43 28.25 41.2599 28.25 39.1134V29.7492C28.25 29.0337 27.6792 28.4536 26.975 28.4536H21.025C20.3208 28.4536 19.75 29.0337 19.75 29.7492V39.1134C19.75 41.2599 18.0375 43 15.925 43H10.825C8.71251 43 7 41.2599 7 39.1134V19.628C7 18.4493 7.52645 17.3342 8.43124 16.5966L21.6062 5.85517ZM24.7979 7.87612C24.3317 7.49604 23.6683 7.49604 23.2021 7.87612L10.0271 18.6175C9.72548 18.8634 9.55 19.2351 9.55 19.628V39.1134C9.55 39.8289 10.1208 40.4089 10.825 40.4089H15.925C16.6292 40.4089 17.2 39.8289 17.2 39.1134V29.7492C17.2 27.6027 18.9125 25.8626 21.025 25.8626H26.975C29.0875 25.8626 30.8 27.6027 30.8 29.7492V39.1134C30.8 39.8289 31.3708 40.4089 32.075 40.4089H37.175C37.8792 40.4089 38.45 39.8289 38.45 39.1134V19.628C38.45 19.2351 38.2745 18.8634 37.9729 18.6175L24.7979 7.87612Z</StreamGeometry>
   </Window.Resources>
 
-  <Grid RowDefinitions="Auto,*" Margin="5 5 5 5">
+  <Grid RowDefinitions="Auto,*" Margin="5">
     <Grid.Styles>
       <Style Selector="Button">
         <Setter Property="CornerRadius" Value="8"/>
@@ -35,7 +35,7 @@
         <Setter Property="Background" Value="DarkRed" />
       </Style>
     </Grid.Styles>
-    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,*,Auto" RowDefinitions="Auto">
+    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,*,Auto" RowDefinitions="Auto" Margin="5">
       <Button Grid.Column="0" Name="BtnAcc" ToolTip.Tip="{tx:Localize main_acc}">
         <PathIcon Data="{StaticResource user}"/>
         <Button.Flyout>
@@ -68,7 +68,7 @@
         </Button.Flyout>
       </Button>
       <TextBlock Grid.Column="2" Text="{tx:Localize main_mower}" VerticalAlignment="Center" FontWeight="DemiBold" FontSize="20"/>
-      <ComboBox Grid.Column="3" MinWidth="200" VerticalAlignment="Center" Margin="5 0"
+      <ComboBox Grid.Column="3" MinWidth="150" VerticalAlignment="Center" Margin="5 0"
                 ItemsSource="{Binding MowNames}" SelectedItem="{Binding Name}" />
       <Button Grid.Column="4" Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}">
         <PathIcon Data="{StaticResource poll}"/>
@@ -78,18 +78,19 @@
       </Button>
     </Grid>
 
-    <TextBlock Grid.Row="1" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
-               HorizontalAlignment="Center" Margin="10 50 10 0" FontSize="50"
+    <TextBlock Grid.Row="0" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
+               HorizontalAlignment="Center" Margin="20 75 20 25" FontSize="40"
                TextWrapping="Wrap" TextAlignment="Center"/>
     <!--
     <TextBlock Grid.Row="1" Text="Bitte einen Moment warten" TextWrapping="Wrap" TextAlignment="Center"
                HorizontalAlignment="Center" Margin="10 50 10 0" FontSize="50"/>
     -->
-    <TabControl Grid.Row="1" SelectedIndex="{Binding TabIdx}">
+    <TabControl Grid.Row="1" SelectedIndex="{Binding TabIdx}" Padding="0">
       <TabControl.Styles>
         <Style Selector="TabItem">
           <Setter Property="FontSize" Value="20"/>
           <Setter Property="MinHeight" Value="30"/>
+          <Setter Property="Padding" Value="5 0 8 3"/>
         </Style>
       </TabControl.Styles>
       
