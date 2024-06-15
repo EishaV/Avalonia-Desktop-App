@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:AvaApp.Views"
         xmlns:tx="clr-namespace:AvaApp.Texts" 
         xmlns:vm="using:AvaApp.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="350" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="450"
         x:Class="AvaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AvaDeskApp"
@@ -35,7 +35,7 @@
         <Setter Property="Background" Value="DarkRed" />
       </Style>
     </Grid.Styles>
-    <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,*,Auto" RowDefinitions="Auto" Margin="5">
+    <Grid Grid.Column="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto,*,Auto" RowDefinitions="Auto" Margin="5">
       <Button Grid.Column="0" Name="BtnAcc" ToolTip.Tip="{tx:Localize main_acc}">
         <PathIcon Data="{StaticResource user}"/>
         <Button.Flyout>
@@ -78,13 +78,9 @@
       </Button>
     </Grid>
 
-    <TextBlock Grid.Row="0" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
-               HorizontalAlignment="Center" Margin="20 75 20 25" FontSize="40"
+    <TextBlock Grid.Row="1" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
+               HorizontalAlignment="Center" Margin="20 40 20 20" FontSize="40"
                TextWrapping="Wrap" TextAlignment="Center"/>
-    <!--
-    <TextBlock Grid.Row="1" Text="Bitte einen Moment warten" TextWrapping="Wrap" TextAlignment="Center"
-               HorizontalAlignment="Center" Margin="10 50 10 0" FontSize="50"/>
-    -->
     <TabControl Grid.Row="1" SelectedIndex="{Binding TabIdx}" Padding="0">
       <TabControl.Styles>
         <Style Selector="TabItem">
