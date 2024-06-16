@@ -148,21 +148,22 @@ namespace AvaApp.ViewModels {
       switch( api ) {
         case "WX":
           switch( pid ) {
-            case 21: case 24: case 33: case 37: img = "WR101SI_WR105SI.webp"; break;
-            case 22: case 23: case 34: case 36: img = "WR102SI_WR104SI.webp"; break;
-            case 35: img = "WR103SI.webp"; break;
-            case 25: case 32: case 38: img = "WR100SI_WR106SI.webp"; break;
-            case 26: case 39: img = "WR110MI.webp"; break;
-            case 40: img = "WR115MI.webp"; break;
-            case 48: img = "WR130E.webp"; break; // S300
-            case 49: img = "WR141E.webp"; break; // M500
-            case 50: case 51: img = "WR142E_WR143E.webp"; break; // M700, M1000
-            case 62: case 66: img = "WR147E.webp"; break; // L1000
-            case 67: img = "WR148E.webp"; break; // L800
-            case 52: case 53: img = "WR153E_WR155E.webp"; break; // L1500, L2000
-            case 70: case 69: img = "WR165E_WR167E.webp"; break; // M500+, M700+
+            case 21: case 24: case 33: case 37: img = "WR101_WR105.webp"; break;
+            case 22: case 23: case 34: case 36: img = "WR102_WR104.webp"; break;
+            case 35: img = "WR103.webp"; break;
+            case 25: case 32: case 38: img = "WR100_WR106.webp"; break;
+            case 26: case 39: img = "WR110.webp"; break;
+            case 28: case 29: case 31: img = "WR111_WR112_WR113.webp"; break;
+            case 40: img = "WR115.webp"; break;
+            case 48: img = "WR130.webp"; break; // S300
+            case 49: img = "WR141.webp"; break; // M500
+            case 50: case 51: img = "WR142_WR143.webp"; break; // M700, M1000
+            case 62: case 66: img = "WR147.webp"; break; // L1000
+            case 67: img = "WR148.webp"; break; // L800
+            case 52: case 53: img = "WR153_WR155.webp"; break; // L1500, L2000
+            case 70: case 69: img = "WR165_WR167.webp"; break; // M500+, M700+
             case 73: case 74: case 75: case 76:
-            case 84: case 85: case 86: case 87: img = "WR206E_WR208E_WR213E_WR216E.webp"; break; // Vision M/L
+            case 84: case 85: case 86: case 87: img = "WR206_WR208_WR213_WR216.webp"; break; // Vision M/L
           }
         break;
         case "KR":
