@@ -20,8 +20,8 @@
     <StreamGeometry x:Key="navi">M2.75254822,18 L21.2525482,18 C21.6667618,18 22.0025482,18.3357864 22.0025482,18.75 C22.0025482,19.1296958 21.7203943,19.443491 21.3543188,19.4931534 L21.2525482,19.5 L2.75254822,19.5 C2.33833466,19.5 2.00254822,19.1642136 2.00254822,18.75 C2.00254822,18.3703042 2.2847021,18.056509 2.65077766,18.0068466 L2.75254822,18 L21.2525482,18 L2.75254822,18 Z M2.75254822,11.5030063 L21.2525482,11.5030063 C21.6667618,11.5030063 22.0025482,11.8387927 22.0025482,12.2530063 C22.0025482,12.6327021 21.7203943,12.9464972 21.3543188,12.9961597 L21.2525482,13.0030063 L2.75254822,13.0030063 C2.33833466,13.0030063 2.00254822,12.6672199 2.00254822,12.2530063 C2.00254822,11.8733105 2.2847021,11.5595153 2.65077766,11.5098529 L2.75254822,11.5030063 L21.2525482,11.5030063 L2.75254822,11.5030063 Z M2.75168905,5.0032392 L21.251689,5.0032392 C21.6659026,5.0032392 22.001689,5.33902564 22.001689,5.7532392 C22.001689,6.13293497 21.7195352,6.44673016 21.3534596,6.49639258 L21.251689,6.5032392 L2.75168905,6.5032392 C2.33747549,6.5032392 2.00168905,6.16745276 2.00168905,5.7532392 C2.00168905,5.37354343 2.28384293,5.05974824 2.64991849,5.01008582 L2.75168905,5.0032392 L21.251689,5.0032392 L2.75168905,5.0032392 Z</StreamGeometry>
   </UserControl.Resources>
 
-  <Grid ColumnDefinitions="*" RowDefinitions="*,Auto,Auto" >
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,*,Auto" Margin="10 0 10 0">
+  <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto" >
+    <Grid Name="StatusTop" Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,*,Auto" Margin="10 0 10 0">
       <Grid Grid.Column="0" Grid.Row="0" ColumnDefinitions="*,Auto,5,Auto,*" Margin="5">
         <TextBlock Grid.Column="1" Text="{Binding Error}" Foreground="{Binding ErrorColor}" FontSize="20"
                    VerticalAlignment="Center" TextWrapping="Wrap"/>
@@ -32,147 +32,150 @@
       <Image Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Source="{Binding WebPic}" Margin="-10" />
       <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding LastZone}'}" />
     </Grid>
-    <Viewbox Grid.Row="1" Stretch="UniformToFill">
-      <StackPanel>
-        <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
-          <StackPanel.Resources>
-            <OnPlatform x:Key="Stamp">
-              <OnPlatform.Default>
-                <FontFamily>Helvetica</FontFamily>
-              </OnPlatform.Default>
-              <OnPlatform.Windows>
-                <FontFamily>Segoe UI</FontFamily>
-              </OnPlatform.Windows>
-              <OnPlatform.Android>
-                <FontFamily>Roboto</FontFamily>
-              </OnPlatform.Android>
-            </OnPlatform>
-          </StackPanel.Resources>
-          <StackPanel.Styles>
-            <Style Selector="TextBlock" >
-              <Setter Property="FontFamily" Value="{StaticResource Stamp}"/>
-              <Setter Property="FontStyle" Value="Italic"/>
-            </Style>
-          </StackPanel.Styles>
-          <TextBlock Text="{tx:Localize state_stamp}"/>
-          <TextBlock Text="{Binding Stamp}"/>
-        </StackPanel>
-        <Border Margin="10 10 10 10" Background="{DynamicResource Back}"
-                BoxShadow="0 0 10 5 Gray" CornerRadius="10" >
-          <Grid Margin="5"
-                ColumnDefinitions="Auto,*,*,*" RowDefinitions="40,Auto,Auto,Auto,Auto,Auto">
-            <Grid.Styles>
-              <Style Selector="TextBlock">
-                <Setter Property="Margin" Value="2 2"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="TextWrapping" Value="Wrap"/>
+    <Grid Name="StatusLow" Grid.Row="1" RowDefinitions="*,Auto">
+      <Viewbox Grid.Row="0" Stretch="UniformToFill">
+        <StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+            <StackPanel.Resources>
+              <OnPlatform x:Key="Stamp">
+                <OnPlatform.Default>
+                  <FontFamily>Helvetica</FontFamily>
+                </OnPlatform.Default>
+                <OnPlatform.Windows>
+                  <FontFamily>Segoe UI</FontFamily>
+                </OnPlatform.Windows>
+                <OnPlatform.Android>
+                  <FontFamily>Roboto</FontFamily>
+                </OnPlatform.Android>
+              </OnPlatform>
+            </StackPanel.Resources>
+            <StackPanel.Styles>
+              <Style Selector="TextBlock" >
+                <Setter Property="FontFamily" Value="{StaticResource Stamp}"/>
+                <Setter Property="FontStyle" Value="Italic"/>
               </Style>
-              <Style Selector="TextBlock.h1">
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="HorizontalAlignment" Value="Left"/>
-              </Style>
-              <Style Selector="Image">
-                <Setter Property="Margin" Value="20 0"/>
-              </Style>
-            </Grid.Styles>
+            </StackPanel.Styles>
+            <TextBlock Text="{tx:Localize state_stamp}"/>
+            <TextBlock Text="{Binding Stamp}"/>
+          </StackPanel>
+          <Border Margin="10 10 10 10" Background="{DynamicResource Back}"
+                  BoxShadow="0 0 10 5 Gray" CornerRadius="10" >
+            <Grid Margin="5"
+                  ColumnDefinitions="Auto,*,*,*" RowDefinitions="40,Auto,Auto,Auto,Auto,Auto">
+              <Grid.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="Margin" Value="2 2"/>
+                  <Setter Property="HorizontalAlignment" Value="Center"/>
+                  <Setter Property="TextWrapping" Value="Wrap"/>
+                </Style>
+                <Style Selector="TextBlock.h1">
+                  <Setter Property="FontWeight" Value="Bold"/>
+                  <Setter Property="HorizontalAlignment" Value="Left"/>
+                </Style>
+                <Style Selector="Image">
+                  <Setter Property="Margin" Value="20 0"/>
+                </Style>
+              </Grid.Styles>
 
-            <Image Grid.Column="1" Source="/Assets/Orient_Pitch.png" Margin="10 0" />
-            <Image Grid.Column="2" Source="/Assets/Orient_Roll.png" />
-            <Image Grid.Column="3" Source="/Assets/Orient_Yaw.png" />
+              <Image Grid.Column="1" Source="/Assets/Orient_Pitch.png" Margin="10 0" />
+              <Image Grid.Column="2" Source="/Assets/Orient_Roll.png" />
+              <Image Grid.Column="3" Source="/Assets/Orient_Yaw.png" />
 
-            <TextBlock Grid.Column="0" Grid.Row="1" Text="{tx:Localize state_pry}" Classes="h1"/>
-            <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding DmpPitch, StringFormat='\{0:N2\}°'}"/>
-            <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding DmpRoll, StringFormat='\{0:N2\}°'}"/>
-            <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding DmpYaw, StringFormat='\{0:N2\}°'}"/>
+              <TextBlock Grid.Column="0" Grid.Row="1" Text="{tx:Localize state_pry}" Classes="h1"/>
+              <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding DmpPitch, StringFormat='\{0:N2\}°'}"/>
+              <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding DmpRoll, StringFormat='\{0:N2\}°'}"/>
+              <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding DmpYaw, StringFormat='\{0:N2\}°'}"/>
 
-            <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize state_accu}" Classes="h1"/>
-            <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding BatPerc, StringFormat='\{0\}%'}"/>
-            <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding BatVolt, StringFormat='\{0\}V'}"/>
-            <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding BatTemp, StringFormat='\{0\}°C'}"/>
+              <TextBlock Grid.Column="0" Grid.Row="2" Text="{tx:Localize state_accu}" Classes="h1"/>
+              <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding BatPerc, StringFormat='\{0\}%'}"/>
+              <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding BatVolt, StringFormat='\{0\}V'}"/>
+              <TextBlock Grid.Column="3" Grid.Row="2" Text="{Binding BatTemp, StringFormat='\{0\}°C'}"/>
 
-            <TextBlock Grid.Column="0" Grid.Row="3" Text="{tx:Localize state_blade}" Classes="h1"/>
-            <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding BladeCur}"/>
-            <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding BladeAt}"/>
-            <Button Grid.Column="3" Grid.Row="3" Height="22" Padding="5 1 5 1"
-                    HorizontalAlignment="Center"
-                    Content="{tx:Localize state_blade_cmd}" Command="{Binding CmdBlade}" />
+              <TextBlock Grid.Column="0" Grid.Row="3" Text="{tx:Localize state_blade}" Classes="h1"/>
+              <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding BladeCur}"/>
+              <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding BladeAt}"/>
+              <Button Grid.Column="3" Grid.Row="3" Height="22" Padding="5 1 5 1"
+                      HorizontalAlignment="Center"
+                      Content="{tx:Localize state_blade_cmd}" Command="{Binding CmdBlade}" />
 
-            <TextBlock Grid.Column="0" Grid.Row="4" Text="{tx:Localize state_stat}" Classes="h1"/>
-            <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding StatDist, StringFormat='\{0:N0\}m'}"/>
-            <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding StatWork}" TextWrapping="Wrap"/>
-            <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding StatBlade}" TextWrapping="WrapWithOverflow"/>
+              <TextBlock Grid.Column="0" Grid.Row="4" Text="{tx:Localize state_stat}" Classes="h1"/>
+              <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding StatDist, StringFormat='\{0:N0\}m'}"/>
+              <TextBlock Grid.Column="2" Grid.Row="4" Text="{Binding StatWork}" TextWrapping="Wrap"/>
+              <TextBlock Grid.Column="3" Grid.Row="4" Text="{Binding StatBlade}" TextWrapping="WrapWithOverflow"/>
 
-            <TextBlock Grid.Column="0" Grid.Row="5" Text="Firmware" Classes="h1"/>
-            <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Firmware}"/>
-          </Grid>
-        </Border>        
-      </StackPanel>
-    </Viewbox>
-    <DockPanel Grid.Row="2" Margin="5" >
-      <DockPanel.Styles>
-        <Style Selector="Button">
-          <Setter Property="CornerRadius" Value="8"/>
-          <Setter Property="Margin" Value="3 0"/>
-          <Setter Property="Padding" Value="5"/>
-        </Style>
-      </DockPanel.Styles>
-      <Button Command="{Binding CmdStart}" IsEnabled="{Binding CanStart}">
-        <StackPanel Orientation="Horizontal" Spacing="5">
-          <!--<Image Source="/Assets/Start.webp" Height="16"/>-->
-          <PathIcon Data="{StaticResource play}"/>
-          <TextBlock Text="{tx:Localize state_start}" />
+              <TextBlock Grid.Column="0" Grid.Row="5" Text="Firmware" Classes="h1"/>
+              <TextBlock Grid.Column="1" Grid.Row="5" Text="{Binding Firmware}"/>
+            </Grid>
+          </Border>
         </StackPanel>
-      </Button>
-      <Button Command="{Binding CmdStop}" IsEnabled="{Binding CanStop}">
-        <StackPanel Orientation="Horizontal" Spacing="5">
-          <!--<Image Source="/Assets/Pause.webp" Height="16"/>-->
-          <PathIcon Data="{StaticResource stop}"/>
-          <TextBlock Text="{tx:Localize state_stop}" />
-        </StackPanel>
-      </Button>
-      <Button Command="{Binding CmdHome}" IsEnabled="{Binding CanHome}">
-        <StackPanel Orientation="Horizontal" Spacing="5">
-          <!--<Image Source="/Assets/Home.webp" Height="16"/>-->
-          <PathIcon Data="{StaticResource home}"/>
-          <TextBlock Text="{tx:Localize state_home}" />
-        </StackPanel>
-      </Button>
-      <Button IsVisible="{Binding CanMenu}" x:Name="BtnMenu">
-        <Button.Flyout>
-          <Flyout Placement="TopEdgeAlignedRight">
-            <StackPanel Spacing="5">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock MinWidth="110" Text="{tx:Localize state_party}" VerticalAlignment="Center" />
-                <ToggleSwitch OnContent="ein" OffContent="aus"
-                              Command="{Binding CmdParty}" IsChecked="{Binding IsParty}" />
+      </Viewbox>
+      <DockPanel Grid.Row="2" Margin="5" >
+        <DockPanel.Styles>
+          <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="3 0"/>
+            <Setter Property="Padding" Value="5"/>
+          </Style>
+        </DockPanel.Styles>
+        <Button Command="{Binding CmdStart}" IsEnabled="{Binding CanStart}">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <!--<Image Source="/Assets/Start.webp" Height="16"/>-->
+            <PathIcon Data="{StaticResource play}"/>
+            <TextBlock Text="{tx:Localize state_start}" />
+          </StackPanel>
+        </Button>
+        <Button Command="{Binding CmdStop}" IsEnabled="{Binding CanStop}">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <!--<Image Source="/Assets/Pause.webp" Height="16"/>-->
+            <PathIcon Data="{StaticResource stop}"/>
+            <TextBlock Text="{tx:Localize state_stop}" />
+          </StackPanel>
+        </Button>
+        <Button Command="{Binding CmdHome}" IsEnabled="{Binding CanHome}">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <!--<Image Source="/Assets/Home.webp" Height="16"/>-->
+            <PathIcon Data="{StaticResource home}"/>
+            <TextBlock Text="{tx:Localize state_home}" />
+          </StackPanel>
+        </Button>
+        <Button IsVisible="{Binding CanMenu}" x:Name="BtnMenu">
+          <Button.Flyout>
+            <Flyout Placement="TopEdgeAlignedRight">
+              <StackPanel Spacing="5">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock MinWidth="110" Text="{tx:Localize state_party}" VerticalAlignment="Center" />
+                  <ToggleSwitch OnContent="ein" OffContent="aus"
+                                Command="{Binding CmdParty}" IsChecked="{Binding IsParty}" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" >
+                  <TextBlock MinWidth="110" Text="{tx:Localize state_edge}" VerticalAlignment="Center" />
+                  <Button Padding="12 3 12 3" CornerRadius="10"
+                          Command="{Binding CmdEdge}" IsEnabled="{Binding CanEdge}" >
+                    <Image Source="/Assets/Edge.webp" Height="16"/>
+                  </Button>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding VisSafe}" >
+                  <TextBlock MinWidth="110" Text="{tx:Localize state_safe}" VerticalAlignment="Center" />
+                  <Button Padding="12 3 12 3" CornerRadius="10"
+                          Command="{Binding CmdSafe}" IsEnabled="{Binding CanSafe}" >
+                    <Image Source="/Assets/SafeHome.webp" Height="16"/>
+                  </Button>
+                </StackPanel>
               </StackPanel>
-              <StackPanel Orientation="Horizontal" >
-                <TextBlock MinWidth="110" Text="{tx:Localize state_edge}" VerticalAlignment="Center" />
-                <Button Padding="12 3 12 3" CornerRadius="10"
-                        Command="{Binding CmdEdge}" IsEnabled="{Binding CanEdge}" >
-                  <Image Source="/Assets/Edge.webp" Height="16"/>
-                </Button>
-              </StackPanel>
-              <StackPanel Orientation="Horizontal" IsVisible="{Binding VisSafe}" >
-                <TextBlock MinWidth="110" Text="{tx:Localize state_safe}" VerticalAlignment="Center" />
-                <Button Padding="12 3 12 3" CornerRadius="10"
-                        Command="{Binding CmdSafe}" IsEnabled="{Binding CanSafe}" >
-                  <Image Source="/Assets/SafeHome.webp" Height="16"/>
-                </Button>
-              </StackPanel>
-            </StackPanel>
-          </Flyout>
-        </Button.Flyout>
-        <PathIcon Data="{StaticResource navi}"/>
-        <!--<Image Source="/Assets/Menu.webp" Height="17"/>-->
-      </Button>
-      <Button Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}" HorizontalAlignment="Right">
-        <StackPanel Orientation="Horizontal" Spacing="5">
-          <!--<Image Source="/Assets/Refresh.webp" Height="16"/>-->
-          <PathIcon Data="{StaticResource sync}"/>
-          <TextBlock Text="{tx:Localize state_poll}" />
-        </StackPanel>
-      </Button>
-    </DockPanel>
+            </Flyout>
+          </Button.Flyout>
+          <PathIcon Data="{StaticResource navi}"/>
+          <!--<Image Source="/Assets/Menu.webp" Height="17"/>-->
+        </Button>
+        <Button Command="{Binding CmdPoll}" IsEnabled="{Binding CanPoll}" HorizontalAlignment="Right">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <!--<Image Source="/Assets/Refresh.webp" Height="16"/>-->
+            <PathIcon Data="{StaticResource sync}"/>
+            <TextBlock Text="{tx:Localize state_poll}" />
+          </StackPanel>
+        </Button>
+      </DockPanel>
+
+    </Grid>
   </Grid>
 </UserControl>
