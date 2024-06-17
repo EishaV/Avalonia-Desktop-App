@@ -71,9 +71,12 @@
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
               </Style>
+              <Style Selector="Image">
+                <Setter Property="Margin" Value="20 0"/>
+              </Style>
             </Grid.Styles>
 
-            <Image Grid.Column="1" Source="/Assets/Orient_Pitch.png" />
+            <Image Grid.Column="1" Source="/Assets/Orient_Pitch.png" Margin="10 0" />
             <Image Grid.Column="2" Source="/Assets/Orient_Roll.png" />
             <Image Grid.Column="3" Source="/Assets/Orient_Yaw.png" />
 

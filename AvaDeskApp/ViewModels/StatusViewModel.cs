@@ -141,13 +141,15 @@ namespace AvaApp.ViewModels {
     }
 
     public void UpdateProduct(string api, ProductItem pi) {
-      string img = string.Empty;
+      string img = "Landroid.png";
       int pid = pi.ProductId;
 
       _pi = pi;
       switch( api ) {
         case "WX":
           switch( pid ) {
+            case 6: case 11: img = "WG757_WG796.webp"; break;
+            case 19: case 20: img = "WG797_WG798.webp"; break;
             case 21: case 24: case 33: case 37: img = "WR101_WR105.webp"; break;
             case 22: case 23: case 34: case 36: img = "WR102_WR104.webp"; break;
             case 35: img = "WR103.webp"; break;
@@ -195,9 +197,13 @@ namespace AvaApp.ViewModels {
       }
 
       if( !string.IsNullOrEmpty(img) ) {
-        var asset = AssetLoader.Open(new Uri($"{AvaAss}/{img}"));
-        WebPic = new Bitmap(asset);
-      }
+        Uri uri = new ($"{AvaAss}/{img}");
+
+        if( AssetLoader.Exists(uri) ) {
+          var asset = AssetLoader.Open(uri);
+          WebPic = new Bitmap(asset);
+        } else WebPic = null;
+      } else WebPic = null;
     }
 
     private static string GetError(ErrorCode ec) {
