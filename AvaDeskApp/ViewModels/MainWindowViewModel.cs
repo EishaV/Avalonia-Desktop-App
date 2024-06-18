@@ -359,12 +359,13 @@ namespace AvaApp.ViewModels {
         if( pi != null ) {
           Trace.TraceInformation($"Main.Open Api IO => {sw.ElapsedMilliseconds}");
           if( pi.Protocol == 0 ) _mb = new MowerP0() { Product = pi };
+          else if( pi.Protocol == 1 ) _mb = new MowerP1() { Product = pi };
           this.RaisePropertyChanged(nameof(CanTabAct));
           CheckCmdOut(Path.Combine(dir, name));
           UpdateMqtt();
-          MowNames.Add(Config.Name ?? "Dummy");
+          MowNames.Add(pi.Name ?? "Dummy");
           this.RaisePropertyChanged(nameof(MowNames));
-          Name = Config.Name ?? "Dummy";
+          Name = pi.Name ?? "Dummy";
           _fsw = new(dir, name) { NotifyFilter = NotifyFilters.LastWrite };
           _fsw.Changed += Watcher_Changed;
           _fsw.Created += Watcher_Created;
@@ -402,6 +403,7 @@ namespace AvaApp.ViewModels {
 
         if( _mb is MowerBase mb ) mb.Json = PositecApi.FormatJson(js);
         if( _mb is MowerP0 mo && DeskApp.GetJson<MqttP0>(path) is MqttP0 m0 ) mo.Mqtt = m0;
+        if( _mb is MowerP1 mn && DeskApp.GetJson<MqttP1>(path) is MqttP1 m1 ) mn.Mqtt = m1;
       }
     }
     
