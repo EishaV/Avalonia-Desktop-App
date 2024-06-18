@@ -5,13 +5,12 @@
         xmlns:views="clr-namespace:AvaApp.Views"
         xmlns:tx="clr-namespace:AvaApp.Texts" 
         xmlns:vm="using:AvaApp.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="360" d:DesignHeight="550"
         x:Class="AvaApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AvaDeskApp"
         Icon="/Assets/AvaMow.ico"
-        MinWidth="300" MinHeight="300"
-        >
+        MinWidth="300" MinHeight="300">
 
   <Design.DataContext>
     <vm:MainWindowViewModel/>
@@ -78,9 +77,6 @@
       </Button>
     </Grid>
 
-    <TextBlock Grid.Row="1" IsVisible="{Binding Splash}" Text="{tx:Localize main_wait}"
-               HorizontalAlignment="Center" Margin="20 40 20 20" FontSize="40"
-               TextWrapping="Wrap" TextAlignment="Center"/>
     <TabControl Grid.Row="1" SelectedIndex="{Binding TabIdx}" Padding="0">
       <TabControl.Styles>
         <Style Selector="TabItem">
@@ -182,6 +178,11 @@
         <views:PluginTab DataContext="{Binding PluginVM}"></views:PluginTab>
       </TabItem>
     </TabControl>
+    <RelativePanel Grid.Row="0" Grid.RowSpan="2" IsVisible="{Binding Splash}"
+          Background="{StaticResource Back}" Opacity="0.8">
+      <TextBlock RelativePanel.AlignHorizontalCenterWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True"
+                 Text="{tx:Localize main_wait}"
+                 FontSize="60" FontStyle="Oblique" FontWeight="SemiBold" TextWrapping="Wrap" TextAlignment="Center"/>
+    </RelativePanel>
   </Grid>
-
 </Window>

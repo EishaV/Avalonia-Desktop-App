@@ -241,6 +241,8 @@ namespace AvaApp.ViewModels {
       var stl = new StampTraceListener(GetTraceFile(0)) { TraceOutputOptions = TraceOptions.DateTime };
       Trace.Listeners.Add(stl);
 
+      if( Application.Current is Application a ) a.RequestedThemeVariant = cfg.Mode == "L" ? ThemeVariant.Light : ThemeVariant.Dark;
+
       StatusVM = new StatusViewModel();
       PluginVM = new PluginTabViewModel();
 
@@ -337,10 +339,11 @@ namespace AvaApp.ViewModels {
 
     public async void MainWindow_Opened(object? sender, System.EventArgs e) {
       Stopwatch sw = Stopwatch.StartNew();
+      string dir = PositecApi.DirData, npi = "ProductItem.json";
       bool acc = false;
 
       Trace.TraceInformation($"Main.Open Beg => {sw.ElapsedMilliseconds}");
-      if( Application.Current is Application a ) a.RequestedThemeVariant = Config.Mode == "L" ? ThemeVariant.Light : ThemeVariant.Dark;
+      //if( Application.Current is Application a ) a.RequestedThemeVariant = Config.Mode == "L" ? ThemeVariant.Light : ThemeVariant.Dark;
       PluginVM?.Init(Config.Plugins);
       Trace.TraceInformation($"Main.Open Pgn => {sw.ElapsedMilliseconds}");
 
@@ -349,9 +352,9 @@ namespace AvaApp.ViewModels {
         this.RaisePropertyChanged(nameof(UsrApi));
       }
 
-      if( UsrApi == "IO" ) {
-        string dir = PositecApi.DirData, name = "CmdOut.json";
-        ProductItem? pi = DeskApp.GetJson<ProductItem>(Path.Combine(dir, "ProductItem.json"));
+      if( File.Exists(Path.Combine(dir, npi)) ) {
+        string name = "CmdOut.json";
+        ProductItem? pi = DeskApp.GetJson<ProductItem>(Path.Combine(dir, npi));
 
         if( pi != null ) {
           Trace.TraceInformation($"Main.Open Api IO => {sw.ElapsedMilliseconds}");
@@ -359,9 +362,9 @@ namespace AvaApp.ViewModels {
           this.RaisePropertyChanged(nameof(CanTabAct));
           CheckCmdOut(Path.Combine(dir, name));
           UpdateMqtt();
-          MowNames.Add("Dummy");
+          MowNames.Add(Config.Name ?? "Dummy");
           this.RaisePropertyChanged(nameof(MowNames));
-          Name = "Dummy";
+          Name = Config.Name ?? "Dummy";
           _fsw = new(dir, name) { NotifyFilter = NotifyFilters.LastWrite };
           _fsw.Changed += Watcher_Changed;
           _fsw.Created += Watcher_Created;
@@ -394,10 +397,12 @@ namespace AvaApp.ViewModels {
     }
 
     private void CheckCmdOut(string path) {
-      string js = File.ReadAllText(path);
+      if( File.Exists(path) ) {
+        string js = File.ReadAllText(path);
 
-      if( _mb is MowerBase mb ) mb.Json = PositecApi.FormatJson(js);
-      if( _mb is MowerP0 mo && DeskApp.GetJson<MqttP0>(path) is MqttP0 m0 ) mo.Mqtt = m0;
+        if( _mb is MowerBase mb ) mb.Json = PositecApi.FormatJson(js);
+        if( _mb is MowerP0 mo && DeskApp.GetJson<MqttP0>(path) is MqttP0 m0 ) mo.Mqtt = m0;
+      }
     }
     
     private void Watcher_Created(object sender, FileSystemEventArgs e) {
@@ -435,6 +440,7 @@ namespace AvaApp.ViewModels {
     private void UpdateMqtt() {
       if( Mower is MowerBase mb ) {
         if( Client is PositecApi pa ) StatusVM?.UpdateProduct(pa.Api, mb.Product);
+        else if( _mb != null && UsrApi != null ) StatusVM?.UpdateProduct(UsrApi, mb.Product);
         if( mb is MowerP0 mo ) {
           if( mo.Mqtt != null && !string.IsNullOrEmpty(mb.Json) ) {
             StatusVM?.Refresh(mo.Mqtt);

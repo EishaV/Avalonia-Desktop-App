@@ -140,13 +140,25 @@ namespace AvaApp.ViewModels {
       RsiPic = new Bitmap(asset);
     }
 
+    private void DefaultPic() {
+      char c = Application.Current?.ActualThemeVariant == ThemeVariant.Dark ? 'W' : 'B';
+
+      Uri uri = new($"{AvaAss}/Mower{c}.webp");
+
+      if( AssetLoader.Exists(uri) ) {
+        var asset = AssetLoader.Open(uri);
+
+        WebPic = new Bitmap(asset);
+        asset.Close();
+      }
+    }
     public void UpdateProduct(string api, ProductItem pi) {
-      string img = "Landroid.png";
+      string img = string.Empty;
       int pid = pi.ProductId;
 
       _pi = pi;
-      switch( api ) {
-        case "WX":
+      switch( api[0] ) {
+        case 'W':
           switch( pid ) {
             case 6: case 11: img = "WG757_WG796.webp"; break;
             case 19: case 20: img = "WG797_WG798.webp"; break;
@@ -168,7 +180,7 @@ namespace AvaApp.ViewModels {
             case 84: case 85: case 86: case 87: img = "WR206_WR208_WR213_WR216.webp"; break; // Vision M/L
           }
         break;
-        case "KR":
+        case 'K':
           switch( pid ) {
             case 1: case 6: img = "KR100_KR101.webp"; break;
             case 2: case 3: case 7: img = "KR110_KR111_KR120.webp"; break;
@@ -179,7 +191,7 @@ namespace AvaApp.ViewModels {
             case 19: case 20: case 23: case 24: case 30: case 31: img = "KR233_KR236.webp"; break;
           }
         break;
-        case "LX":
+        case 'L':
           switch( pid ) {
             case 6: img = "LX790i.webp"; break;
             case 8: img = "LX812i.webp"; break;
@@ -189,7 +201,7 @@ namespace AvaApp.ViewModels {
             case 26: img = "LX838i.webp"; break;
           }
         break;
-        case "SM":
+        case 'S':
           switch( pid ) {
             case 1: img = "SM800.webp"; break;
           }
@@ -203,7 +215,7 @@ namespace AvaApp.ViewModels {
           var asset = AssetLoader.Open(uri);
           WebPic = new Bitmap(asset);
         } else WebPic = null;
-      } else WebPic = null;
+      } else DefaultPic();
     }
 
     private static string GetError(ErrorCode ec) {
@@ -341,9 +353,7 @@ namespace AvaApp.ViewModels {
     }
     #endregion
     public StatusViewModel() {
-      var asset = AssetLoader.Open(new Uri($"{AvaAss}/Landroid.png"));
-
-      WebPic = new Bitmap(asset);
+      DefaultPic();
       if( Design.IsDesignMode ) {
         BatPerc = 100.0F; BatVolt = 20.5F; BatTemp = 36.0F;
         DmpPitch = DmpRoll = DmpYaw = 17.3;
