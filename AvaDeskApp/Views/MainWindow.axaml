@@ -166,8 +166,8 @@
               </Style>
             </DataGrid.Styles>
             <DataGrid.Columns>
-              <DataGridTextColumn Header="Zeitstempel" Binding="{Binding Stamp}"/>
-              <DataGridTextColumn Header="Status/Fehler" Binding="{Binding State}" />
+              <DataGridTextColumn Header="{tx:Localize timestamp}" Binding="{Binding Stamp}"/>
+              <DataGridTextColumn Header="{tx:Localize status_error}" Binding="{Binding State}" />
               <DataGridTextColumn Header="C" Binding="{Binding Charge}" />
             </DataGrid.Columns>
           </DataGrid>
