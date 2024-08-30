@@ -64,6 +64,10 @@
     <None Update="Texts\strings.en.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Texts\strings.fr.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
