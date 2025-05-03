@@ -537,7 +537,29 @@ namespace AvaApp.ViewModels {
     public async Task ActCmdCall() {
       Activities.Clear();
       if( Client is PositecApi pa && await pa.CheckToken() ) {
-        foreach( ActivityEntry ae in await pa.GetActivities(Name) ) Activities.Add(new ActEntryVM(ae));
+        var lae = await pa.GetActivities(Name);
+
+        for( int i = 0; i < lae.Count; i++ ) {
+          var ae = lae[i];
+
+          if(ae.Payload.Dat.LastState == StatusCode.IDLE 
+             && i > 0 && lae[i - 1].Payload.Dat.LastState == StatusCode.HOME) {
+            DateTime dt0 = DateTime.Parse(ae.Stamp);
+            DateTime dt1 = DateTime.Parse(lae[i - 1].Stamp);
+            TimeSpan ts = dt1 - dt0;
+
+            if( ts.TotalSeconds < 5 ) continue;
+          }
+          if( ae.Payload.Dat.LastState == StatusCode.HOME && ae.Payload.Dat.Battery.Charging == ChargeCoge.CHARGED
+             && i < lae.Count - 1 && lae[i + 1].Payload.Dat.LastState == StatusCode.IDLE ) {
+            DateTime dt0 = DateTime.Parse(ae.Stamp);
+            DateTime dt1 = DateTime.Parse(lae[i + 1].Stamp);
+            TimeSpan ts = dt0 - dt1;
+
+            if( ts.TotalSeconds < 5 ) continue;
+          }
+          Activities.Add(new ActEntryVM(ae));
+        }
       }
       this.RaisePropertyChanged(nameof(Activities));
     }
@@ -567,7 +589,8 @@ namespace AvaApp.ViewModels {
       };
       var msgbox = MsBox.Avalonia.MessageBoxManager.GetMessageBoxStandard(msgpar);
 
-      await msgbox.ShowWindowDialogAsync(AppMainWindow);
+      if(AppMainWindow != null) await msgbox.ShowWindowDialogAsync(AppMainWindow);
+      else await msgbox.ShowWindowAsync();
     }
   }
 }

@@ -67,7 +67,8 @@ public class PluginTest : IPlugin {
         ButtonDefinitions = ButtonEnum.YesNo, ContentTitle = "TestPlugin", ContentMessage = "MsgBox for hsteinme", WindowStartupLocation = WindowStartupLocation.CenterOwner
       };
       var msgbox = MessageBoxManager.GetMessageBoxStandard(msgpar);
-      if(Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+      if(Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+         && desktop.MainWindow != null) {
         ButtonResult br = await msgbox.ShowWindowDialogAsync(desktop.MainWindow);
 
         ParaOut.Text = $"MsgBox 1 => {br}";

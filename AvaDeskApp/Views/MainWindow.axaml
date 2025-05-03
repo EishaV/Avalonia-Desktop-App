@@ -128,11 +128,11 @@
                 Background="Silver">
             <TextBlock Grid.Column="0" Classes="h1" Text="{tx:Localize act_stamp}"/>
             <TextBlock Grid.Column="1" Classes="h1" Text="{tx:Localize act_state}"/>
-            <TextBlock Grid.Column="2" Classes="h1" Text="C" Margin="0 0 15 0"/>
+            <TextBlock Grid.Column="2" Classes="h1" Text="C" Margin="0 0 25 0"/>
           </Grid>
           <!-- Background="{DynamicResource Back}"-->
           <ScrollViewer Grid.Row="1" AllowAutoHide="False" Background="{DynamicResource Back}">
-            <ItemsControl ItemsSource="{Binding Activities}" Padding="0 0 15 0">
+            <ItemsControl ItemsSource="{Binding Activities}" Padding="0 0 0 0">
               <ItemsControl.Styles>
                 <Style Selector="TextBlock">
                   <Setter Property="Background" Value="{Binding Color}" />

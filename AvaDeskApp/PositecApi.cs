@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,8 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Diagnostics;
+using MQTTnet.Diagnostics.Logger;
 
 using ApiDic = System.Collections.Generic.Dictionary<string, Positec.ApiEntry>;
 
@@ -102,7 +102,7 @@ namespace Positec {
   public class RecvEventArgs(string api, string key) : EventArgs {
     public string Api { get; set; } = api; public string Key { get; set; } = key;
   }
-  public class PositecApi {
+  public partial class PositecApi {
     private readonly HttpClient httpClient = new();
     private readonly ErrDelegte Err;
 
@@ -148,7 +148,7 @@ namespace Positec {
     }
 
     public PositecApi(ErrDelegte err, string uid) {
-      var fac = new MqttFactory(); //.UseWebSocket4Net();
+      var fac = new MqttClientFactory(); //.UseWebSocket4Net();
       string path = AppContext.BaseDirectory;
       string name = Dns.GetHostName();
 
@@ -493,7 +493,7 @@ namespace Positec {
       await CheckToken();
       tps = TokenToParts();
       _mqttCOB = _mqttCOB.WithCredentials($"da?jwt={tps[0]}.{tps[1]}&x-amz-customauthorizer-signature={tps[2]}");
-      _mqttCOB = _mqttCOB.WithoutThrowOnNonSuccessfulConnectResponse();
+      //_mqttCOB = _mqttCOB.WithoutThrowOnNonSuccessfulConnectResponse();
 
       var op = _mqttCOB.Build();
       try {
@@ -514,9 +514,12 @@ namespace Positec {
       }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("GeneratedRegex", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.", Justification = "<Ausstehend>")]
+    //[System.Diagnostics.CodeAnalysis.SuppressMessage("GeneratedRegex", "SYSLIB1045:In „GeneratedRegexAttribute“ konvertieren.", Justification = "<Ausstehend>")]
+    [GeneratedRegex("(\"(?:cfg|dat)\")")]
+    private static partial Regex ReCfgDat();
+
     public static string FormatJson(string json) {
-      json = Regex.Replace(json, "(\"(?:cfg|dat)\")", "\r\n  $1");
+      json = ReCfgDat().Replace(json, "\r\n  $1");
       json = Regex.Replace(json, "(\"id\":[^[])", "\r\n    $1");
       json = Regex.Replace(json, "(\"(?:sn|lg|dt|tm|cmd|mz|rd|tq|al|rtk|head|modules)\")", "\r\n    $1");
       json = Regex.Replace(json, "(\"(?:4G|EA|ck|map)\":{)", "\r\n      $1");
@@ -531,14 +534,14 @@ namespace Positec {
 
     Task Mqtt_ApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs e) {
       string tpc = e.ApplicationMessage.Topic;
-      string json = Encoding.UTF8.GetString(e.ApplicationMessage.PayloadSegment);
+      string json = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
       string? key = Mowers.Keys.FirstOrDefault(k => Mowers[k].Product.Topic?.CmdOut == tpc);
 
       Trace.TraceInformation($"Receive topic: {tpc}");
       Trace.TraceInformation($"Receive json: {json}");
       if( !string.IsNullOrEmpty(key) ) {
         try {
-          if( e.ApplicationMessage.PayloadSegment.Array is byte[] ba ) {
+          if( e.ApplicationMessage.Payload.ToArray() is byte[] ba ) {
             if( Mowers[key] is MowerP0 mo && Json.Read<MqttP0>(ba) is MqttP0 m0 ) mo.Mqtt = m0;
             if( Mowers[key] is MowerP1 mn && Json.Read<MqttP1>(ba) is MqttP1 m1 ) mn.Mqtt = m1;
           }

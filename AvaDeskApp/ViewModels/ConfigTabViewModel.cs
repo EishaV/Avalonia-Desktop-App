@@ -206,7 +206,8 @@ namespace AvaApp.ViewModels {
           if(m.Cfg.Id == _id) {
             var msgbox = MsBox.Avalonia.MessageBoxManager.GetMessageBoxStandard("", "Update Plan ist erfolgt");
 
-            if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+            if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+               && desktop.MainWindow != null) {
               await msgbox.ShowWindowDialogAsync(desktop.MainWindow);
             }
           }
@@ -283,12 +284,11 @@ namespace AvaApp.ViewModels {
                                                   ContentTitle = "Avalonia MessageBox", ContentHeader ="Check json", ContentMessage = json,
                                                   SystemDecorations = SystemDecorations.BorderOnly };
       var msgbox = MessageBoxManager.GetMessageBoxStandard(msgpar);
-      if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) {
+      if(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+         && desktop.MainWindow != null ) {
         ButtonResult br = await msgbox.ShowWindowDialogAsync(desktop.MainWindow);
 
-        if( br == ButtonResult.Ok ) {
-          MainWindowViewModel.Instance.Publish(json);
-        }
+        if( br == ButtonResult.Ok ) MainWindowViewModel.Instance.Publish(json);
       }
     }
   }

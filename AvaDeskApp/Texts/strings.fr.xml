@@ -117,7 +117,8 @@
   <string name="act_stamp">Date Heure</string>
   <string name="act_state">Condition</string>
   <string name="act_poll">Rappel</string>
-
+  <!--
   <string name="status_error">Statut/Erreur</string>
   <string name="timestamp">"Date/Heures"</string>
+  -->
 </resources>
