@@ -14,7 +14,7 @@ public class PluginNotify : IPlugin {
 
     if( verbose ) DeskApp.Trace($"PluginToast Notify Init => {text}");
     if( OperatingSystem.IsWindows() ) {
-      //pi = new("powershell.exe", $"-File \"{AppDomain.CurrentDomain.BaseDirectory}Plugins\\Toast.ps1\" \"{text}\"");
+        //pi = new("powershell.exe", $"-File \"{AppDomain.CurrentDomain.BaseDirectory}Plugins\\Toast.ps1\" \"{text}\"");
       string cmd = string.Empty;
 
       cmd += "[Windows.UI.Notifications.ToastNotification, Windows.UI.Notifications, ContentType = WindowsRuntime];";

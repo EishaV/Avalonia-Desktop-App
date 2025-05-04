@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Compile Include="Plugins\PluginCsvLogWriter.cs" />
+    <Compile Include="Plugins\PluginPlaySound.cs" />
     <Compile Include="Plugins\PluginTest.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
