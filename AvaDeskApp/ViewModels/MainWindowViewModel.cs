@@ -143,7 +143,6 @@ namespace AvaApp.ViewModels {
     }
     private int _TabIdx;
 
-
     public StatusViewModel? StatusVM { get; }
     public ConfigTabViewModel ConfigVM { get; }
     public PluginTabViewModel? PluginVM { get; }
@@ -392,11 +391,14 @@ namespace AvaApp.ViewModels {
           b?.Flyout?.ShowAt(b);
         }
       }
-      Splash = false; this.RaisePropertyChanged(nameof (Splash));
+      Splash = false; this.RaisePropertyChanged(nameof(Splash));
 
       Trace.TraceInformation($"Main.Open End => {sw.ElapsedMilliseconds}");
     }
 
+    public void MainWindow_Activated(object? sender, System.EventArgs e) {
+      if( TabIdx == 0 && Mower != null && DateTime.Now - Mower.LastRecv > TimeSpan.FromMinutes(1) ) Publish("");
+    }
     private void CheckCmdOut(string path) {
       if( File.Exists(path) ) {
         string js = File.ReadAllText(path);
