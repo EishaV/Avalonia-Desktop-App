@@ -109,7 +109,8 @@ namespace AvaApp.ViewModels {
 
         CanMenu = _pi?.Endpoint != null && _pi?.Topic != null && c.Schedule.Ots != null && c.Schedule.Party != null;
         IsParty = c.Schedule.Mode == 2;
-        if( IsParty ) State += " Party";
+        if( IsParty ) State += " Party ∞";
+        if( c.Schedule.Party > 0 ) State += $" Party {c.Schedule.Party}min";
         CanEdge = d.LastState == StatusCode.HOME;
         VisSafe = _pi?.Capas?.Contains("safe_go_home") ?? false;
         CanSafe = d.LastState == StatusCode.GRASS_CUTTING;
