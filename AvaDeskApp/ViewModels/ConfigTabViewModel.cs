@@ -125,6 +125,23 @@ namespace AvaApp.ViewModels {
         foreach( SchedulerEntry se in SchedulerD ) se.CalcEnd();
       }
     } int _ScPerc;
+    public void CmdScShift(object para) {
+      if( para is string s ) {
+        string[] ss = s.Split(' ');
+        int scmod = int.Parse(ss[0]);
+        int shift = int.Parse(ss[1]);
+
+        for( int i = 0; i < SchedulerD.Count; i++) {
+          if( !DoubleSc || i % 2 == scmod ) {
+            var sce = SchedulerD[i];
+            TimeSpan beg = TimeSpan.Parse(sce.Beg);
+
+            beg += TimeSpan.FromMinutes(shift);
+            sce.Beg = beg.ToString("hh\\:mm");
+          }
+        }
+      }
+    }
     public void CmdScPerc(object para) {
       if( para is string s ) {
         ScPerc = int.Parse(s);
@@ -173,7 +190,7 @@ namespace AvaApp.ViewModels {
         if(b || (c.Id > 1 && c.Id != _id) ) {
           ScMode = c.Schedule.Mode; this.RaisePropertyChanged(nameof(ScMode));
           ScPerc = c.Schedule.Perc; this.RaisePropertyChanged(nameof(ScPerc)); // vor End wegen Calc
-          DoubleSc = c.Schedule.DDays != null && c.Schedule.DDays.Count == 7;
+          DoubleSc = c.Schedule.DDays != null && c.Schedule.DDays.Count == 7; this.RaisePropertyChanged(nameof(DoubleSc));
           SchedulerD.Clear();
           if(c.Schedule.Days != null && c.Schedule.Days.Count == 7) {
             for(int i = 1; i < 8; i++) { // Mo - So
