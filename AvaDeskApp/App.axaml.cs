@@ -76,6 +76,7 @@ namespace AvaApp {
 
         if( mwvm != null ) {
           desktop.MainWindow.Opened += mwvm.MainWindow_Opened;
+          desktop.MainWindow.Activated += mwvm.MainWindow_Activated;
           desktop.MainWindow.Closed += mwvm.MainWindow_Closed;
           desktop.MainWindow.Closing += mwvm.MainWindow_Closing;
           //desktop.MainWindow.PositionChanged += mwvm.MainWindow_Moved;

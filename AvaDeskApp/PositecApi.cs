@@ -89,6 +89,8 @@ namespace Positec {
   public class MowerBase {
     public ProductItem Product { get; set; } = new ProductItem();
     public string Json { get; set; } = string.Empty;
+
+    public DateTime LastRecv = DateTime.MinValue;
   }
 
   public class MowerP0 : MowerBase {
@@ -549,6 +551,7 @@ namespace Positec {
           Trace.TraceError($"Recveive {ex}");
         }
         Mowers[key].Json = FormatJson(json);
+        Mowers[key].LastRecv = DateTime.Now;
         RecvMqtt?.Invoke(this, new RecvEventArgs(_api, key));
       }
       return Task.CompletedTask;
