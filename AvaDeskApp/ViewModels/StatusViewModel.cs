@@ -170,26 +170,26 @@ namespace AvaApp.ViewModels {
             case 26: case 39: img = "WR110.webp"; break;
             case 28: case 29: case 31: img = "WR111_WR112_WR113.webp"; break;
             case 40: img = "WR115.webp"; break;
-            case 48: img = "WR130.webp"; break; // S300
-            case 49: img = "WR141.webp"; break; // M500
+            case 48: case 79: img = "WR130.webp"; break; // S300
+            case 49: case 90: case 91: img = "WR141.webp"; break; // M500, WR168 S250 / WR169 S300 => C2E
             case 50: case 51: img = "WR142_WR143.webp"; break; // M700, M1000
             case 62: case 66: img = "WR147.webp"; break; // L1000
             case 67: img = "WR148.webp"; break; // L800
             case 52: case 53: img = "WR153_WR155.webp"; break; // L1500, L2000
-            case 70: case 69: img = "WR165_WR167.webp"; break; // M500+, M700+
-            case 73: case 74: case 75: case 76:
-            case 84: case 85: case 86: case 87: img = "WR206_WR208_WR213_WR216.webp"; break; // Vision M/L
+            case 69: case 70: case 80: img = "WR165_WR167.webp"; break; // M500+, M700+
+            case 73: case 74: case 84: case 85: case 101: case 103: img = "WR206_WR208.webp"; break; // Vision M
+            case 75: case 76: case 86: case 87: case 102: img = "WR213_WR216.webp"; break; // Vision L
           }
-        break;
+          break;
         case 'K':
           switch( pid ) {
-            case 1: case 6: img = "KR100_KR101.webp"; break;
-            case 2: case 3: case 7: img = "KR110_KR111_KR120.webp"; break;
-            case 4: case 5: case 8: case 9: case 10: img = "KR112_KR113_KR121_KR122_KR123.webp"; break;
-            case 11: case 12: img = "KR133_KR136.webp"; break;
-            case 13: case 16: case 25: case 26: case 27: img = "KR172.webp"; break;
-            case 14: case 17: case 21: case 22: case 28: case 29: img = "KR173_KR174.webp"; break;
-            case 19: case 20: case 23: case 24: case 30: case 31: img = "KR233_KR236.webp"; break;
+            case 1: case 6: img = "Kress Nano.webp"; break;
+            case 2: case 3: case 7: img = "Kress Miss.webp"; break;
+            case 4: case 5: case 8: case 9: case 10: img = "Kress Miss OAS.webp"; break;
+            case 11: case 12: img = "Kress Mega.webp"; break;
+            case 13: case 32: case 34: case 35: img = "Kress RTK Miss.webp"; break;
+            case 14: case 21: case 25: case 33:  img = "Kress RTK Miss OAS.webp"; break;
+            case 19: case 23: case 37:  img = "Kress RTK Mega.webp"; break;
           }
         break;
         case 'L':

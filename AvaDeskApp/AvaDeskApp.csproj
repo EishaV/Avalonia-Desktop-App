@@ -10,7 +10,7 @@
     <VersionPrefix>1.0.20</VersionPrefix>
     <Version>$(VersionPrefix)</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <ApplicationIcon>Assets\Mower.ico</ApplicationIcon>    
+    <ApplicationIcon>Assets\AvaMow.ico</ApplicationIcon>    
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,10 +33,6 @@
     <Compile Include="Plugins\PluginNotify.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Assets\Mower.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -74,4 +70,8 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="cd &quot;$(TargetDir)&quot;&#xD;&#xA;rd /s /q &quot;cs&quot; &quot;de&quot; &quot;es&quot; &quot;fr&quot; &quot;it&quot; &quot;ja&quot; &quot;ko&quot; &quot;pl&quot; &quot;pt-BR&quot; &quot;ru&quot; &quot;tr&quot; &quot;zh-Hans&quot; &quot;zh-Hant&quot;" />
   </Target>
+
+  <ItemGroup>
+    <AvaloniaResource Remove="Assets\Mower.ico" />
+  </ItemGroup>
 </Project>
